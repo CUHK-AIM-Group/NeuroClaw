@@ -1,6 +1,6 @@
 ---
 name: claw-shell
-description: "Use this skill whenever any NeuroClaw skill, sub-agent, or model needs to execute shell commands safely (e.g. source environment scripts, run recon-all, git operations, conda commands, ls, cat logs, etc.). Triggers include: 'run shell', 'execute command', 'shell command', 'tmux claw', 'run in claw session', 'safe shell execution', or any request that requires running terminal commands. This skill is the **mandatory gatekeeper for all shell execution** in NeuroClaw: it ALWAYS routes commands through the dedicated tmux session `claw`, never touches other sessions, and returns captured output to the calling agent."
+description: "Use this skill whenever any NeuroClaw skill, sub-agent, or model needs to execute shell commands safely (e.g. source environment scripts, run recon-all, git operations, conda commands, ls, cat logs, etc.). Triggers include: 'run shell', 'execute command', 'shell command', 'tmux claw', 'run in claw session', 'safe shell execution', or any request that requires running terminal commands. This skill is the mandatory gatekeeper for all shell execution in NeuroClaw: it ALWAYS routes commands through the dedicated tmux session `claw`, never touches other sessions, and returns captured output to the calling agent."
 license: MIT License (NeuroClaw core skill – freely modifiable within the project)
 ---
 
@@ -16,15 +16,15 @@ license: MIT License (NeuroClaw core skill – freely modifiable within the proj
 - Captures the latest pane output and returns it to the calling skill/agent.
 - Enforces strict safety rules: dangerous commands (sudo, rm, reboot, etc.) trigger an explicit user confirmation step before execution.
 
-This design solves the “主 agent 不会主动安装依赖” and “long-running command” problems identified in the MedicalClaw evaluation by providing centralized logging, detachment support, and safe execution.
+This design solves the problems of the main agent not proactively installing dependencies and handling long-running commands, as identified in the MedicalClaw evaluation, by providing centralized logging, detachment support, and safe execution.
 
 ## Quick Reference
 
-| Type                  | Example Commands                              | Behavior |
-|-----------------------|-----------------------------------------------|----------|
-| Safe (direct run)     | `ls -la`, `cat log.txt`, `git status`         | Executes immediately in `claw` session |
-| Environment setup     | `source $FREESURFER_HOME/SetUpFreeSurfer.sh`  | Executes and returns output |
-| Long-running pipeline | `recon-all -subjid sub-001 -all -parallel`   | Runs in background-capable tmux pane |
+| Type                              | Example Commands                                      | Behavior |
+|-----------------------------------|-------------------------------------------------------|----------|
+| Safe (direct run)                 | `ls -la`, `cat log.txt`, `git status`                 | Executes immediately in `claw` session |
+| Environment setup                 | `source $FREESURFER_HOME/SetUpFreeSurfer.sh`          | Executes and returns output |
+| Long-running pipeline             | `recon-all -subjid sub-001 -all -parallel`            | Runs in background-capable tmux pane |
 | Dangerous (requires confirmation) | `rm -rf ...`, `sudo apt install ...`, `docker system prune -a` | Asks user “YES” before proceeding |
 
 **Tool Interface**  
@@ -37,6 +37,7 @@ This design solves the “主 agent 不会主动安装依赖” and “long-runn
 This is a core NeuroClaw skill and requires no external packages beyond tmux.
 
 **One-time setup (run once via dependency-planner or manually):**
+
 ```bash
 # Ensure tmux session exists
 tmux new -s claw -d || true
@@ -51,6 +52,7 @@ To register in NeuroClaw:
 ## Usage Examples
 
 ### Example 1: Simple command
+
 ```text
 # Skill call:
 claw_shell_run with command="ls -la /data"
@@ -58,7 +60,8 @@ claw_shell_run with command="ls -la /data"
 # Returns captured tmux pane output directly to the agent
 ```
 
-### Example 2: FreeSurfer environment + recon-all (delegated from freesurfer-skill)
+### Example 2: FreeSurfer environment + recon-all (delegated from freesurfer-processor)
+
 ```text
 # Internal commands sent to claw-shell:
 1. export FREESURFER_HOME=/usr/local/freesurfer
@@ -67,6 +70,7 @@ claw_shell_run with command="ls -la /data"
 ```
 
 ### Example 3: Dangerous command (safety trigger)
+
 ```text
 # User requests: rm -rf /tmp/old_data
 # claw-shell automatically responds:
@@ -92,7 +96,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="NeuroClaw Claw-Shell Wrapper")
     parser.add_argument("--command", required=True, help="Shell command to run in tmux session 'claw'")
     args = parser.parse_args()
-
     claw_shell_run(args.command)
 ```
 
@@ -107,21 +110,22 @@ if __name__ == "__main__":
 
 ## When to Call This Skill
 
-- Any skill (freesurfer-skill, dependency-planner, git-essentials, etc.) needs to run shell commands.
+- Any skill (`freesurfer-processor`, `dependency-planner`, `git-essentials`, etc.) needs to run shell commands.
 - Post-installation environment variable setup.
 - File operations, log checking, or any terminal action inside NeuroClaw.
 
 ## Complementary / Related Skills
 
-- `dependency-planner`   → delegates installation and env-var commands here
-- `freesurfer-skill` → delegates all recon-all and setup commands here
+- `dependency-planner` → delegates installation and environment variable commands here
 - `git-essentials` / `git-workflows` → git operations routed here
-- `conda-env-manager`    → conda commands routed here
+- `conda-env-manager` → conda commands routed here
 
 ## Reference & Source
 
 Custom core skill designed for NeuroClaw to provide safe, tmux-based shell execution while solving the dependency and long-running command issues from the MedicalClaw evaluation.
 
-Created At: 2026-03-19  
-Last Updated At: 2026-03-19  
-Author: chengwang96
+---
+
+Created At: 2026-03-19 20:00 HKT  
+Last Updated At: 2026-03-25 16:22 HKT  
+Author: Cheng Wang
