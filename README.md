@@ -138,6 +138,23 @@ NeuroClaw/
 
 ## 🛠️ Skill Quick Reference
 
+### Base Layer
+| Skill | Function | Status |
+|------|----------|--------|
+| `dcm2nii` | DICOM → NIfTI conversion with metadata support | ✅ |
+| `nii2dcm` | NIfTI → DICOM conversion for clinical interoperability | ✅ |
+| `git-essentials` | Core Git commands for collaboration | ✅ |
+| `git-workflows` | Advanced Git workflows (rebase/worktree/bisect) | ✅ |
+| `multi-search-engine` | Multi-engine web search without API keys | ✅ |
+| `conda-env-manager` | Conda environment lifecycle management | ✅ |
+| `docker-env-manager` | Docker environment management | ✅ |
+| `dependency-planner` | Dependency planning and safe installation workflow | ✅ |
+| `claw-shell` | Safe shell execution gateway via dedicated session | ✅ |
+| `overleaf-skill` | Overleaf sync and collaborative manuscript operations | ✅ |
+| `academic-research-hub` | Multi-source academic search and paper retrieval | ✅ |
+| `bids-organizer` | Base skill for organizing raw data into BIDS structure | ✅ |
+| `auto-qc` | Automated quality control for newly added skills | ⏳ |
+
 ### Interface Layer (Task Orchestration)
 | Skill | Function | Status |
 |------|----------|--------|
@@ -152,12 +169,6 @@ Subagent in NeuroClaw includes four categories: **tool**, **model**, **dataset**
 #### Tool
 | Skill | Function | Status |
 |------|----------|--------|
-| `dependency-planner` | Dependency planning and safe installation workflow | ✅ |
-| `claw-shell` | Safe shell execution gateway via dedicated session | ✅ |
-| `conda-env-manager` | Conda environment lifecycle management | ✅ |
-| `docker-env-manager` | Docker environment management | ✅ |
-| `dcm2nii` | DICOM → NIfTI conversion with metadata support | ✅ |
-| `nii2dcm` | NIfTI → DICOM conversion for clinical interoperability | ✅ |
 | `mne-eeg-tool` | Base-layer MNE-Python implementation for EEG | ✅ |
 | `fsl-tool` | FSL-based sMRI/fMRI/DWI processing utilities | ✅ |
 | `fmriprep-tool` | fMRIPrep pipeline wrapper and execution | ✅ |
@@ -167,13 +178,6 @@ Subagent in NeuroClaw includes four categories: **tool**, **model**, **dataset**
 | `nilearn-tool` | Fast neuroimaging feature extraction and decoding prep | ✅ |
 | `conn-tool` | Functional connectivity computation and analysis | ✅ |
 | `freesurfer-tool` | FreeSurfer-based MRI processing and segmentation | ✅ |
-| `bids-organizer` | Base skill for organizing raw data into BIDS structure | ✅ |
-| `auto-qc` | Automated quality control for newly added skills | ⏳ |
-| `multi-search-engine` | Multi-engine web search without API keys | ✅ |
-| `academic-research-hub` | Multi-source academic search and paper retrieval | ✅ |
-| `git-essentials` | Core Git commands for collaboration | ✅ |
-| `git-workflows` | Advanced Git workflows (rebase/worktree/bisect) | ✅ |
-| `overleaf-skill` | Overleaf sync and collaborative manuscript operations | ✅ |
 
 #### Model
 | Skill | Function | Status |
