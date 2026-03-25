@@ -1,14 +1,15 @@
+<div align="center">
+
 # NeuroClaw: End-to-End Intelligent System for Neuroscience Research
 
 <div align="center">
-
-**An end-to-end intelligent agent system for neuroscience research workflows**
 
 [Features](#key-features) • [Quick Start](#quick-start) • [Project Structure](#project-structure) • [Skills](#skill-quick-reference) • [Acknowledgments](#acknowledgments)
 
 </div>
 
----
+</div>
+
 
 ## 📖 Overview
 
@@ -92,23 +93,37 @@ NeuroClaw/
 ├── README.md                       # This file
 ├── USER.md                         # User-defined configurations and preferences
 ├── SOUL.md                         # System behavior guidelines and principles
-├── skills/                         # Skill collection (hierarchical architecture)
-│   ├── [interface-skills]/         # Interface layer skills
-│   │   ├── task-planner/
-│   │   ├── dependency-manager/
-│   │   └── skill-discovery/
-│   │
-│   ├── [subagent-skills]/          # Subagent layer skills
-│   │   ├── research-workflow/
-│   │   ├── experiment-design/
-│   │   ├── data-processing-pipeline/
-│   │   └── model-execution/
-│   │
-│   └── [base-tool-skills]/         # Base tool layer skills
-│       ├── file-operations/
-│       ├── data-conversion/
-│       ├── eeg-processing/
-│       └── ...
+├── skills/                         # Flat skill directory (logical grouping in docs)
+│   ├── academic-research-hub/
+│   ├── bids-organizer/
+│   ├── claw-shell/
+│   ├── conda-env-manager/
+│   ├── conn-tool/
+│   ├── dcm2nii/
+│   ├── dependency-planner/
+│   ├── dipy-tool/
+│   ├── docker-env-manager/
+│   ├── dwi-skill/
+│   ├── eeg-skill/
+│   ├── experiment-controller/
+│   ├── fmri-skill/
+│   ├── fmriprep-tool/
+│   ├── freesurfer-tool/
+│   ├── fsl-tool/
+│   ├── git-essentials/
+│   ├── git-workflows/
+│   ├── hcppipeline-tool/
+│   ├── method-design/
+│   ├── mne-eeg-tool/
+│   ├── multi-search-engine/
+│   ├── nii2dcm/
+│   ├── nilearn-tool/
+│   ├── overleaf-skill/
+│   ├── paper-writing/
+│   ├── qsiprep-tool/
+│   ├── research-idea/
+│   ├── smri-skill/
+│   └── wmh-segmentation/
 │
 ├── materials/                      # Research materials and reference resources
 │   ├── datasets/                   # Public dataset descriptions and processing guides
@@ -123,56 +138,65 @@ NeuroClaw/
 
 ## 🛠️ Skill Quick Reference
 
-### Interface Layer (Task Orchestration & Environment Management)
+### Interface Layer (Task Orchestration)
 | Skill | Function | Status |
 |------|----------|--------|
-| `dependency-planner` | Plans and manages all dependency installations with safety checks | ✅ |
-| `claw-shell` | Central safe shell execution layer for all commands | ✅ |
-| `conda-env-manager` | Creates, manages, and exports isolated conda environments | ✅ |
 | `research-idea` | Brainstorms and generates research ideas from literature | ✅ |
 | `method-design` | Formalizes network architecture and derives theoretical components | ✅ |
 | `experiment-controller` | Finds and executes reproducible research experiments | ✅ |
 | `paper-writing` | Generates hierarchical manuscript drafts from IDEA/METHOD/EXPERIMENT | ✅ |
-| `overleaf-skill` | Syncs LaTeX manuscripts to Overleaf with version control | ✅ |
 
-### Subagent & Modality Layer (Research Workflows)
+### Subagent Layer
+Subagent in NeuroClaw includes four categories: **tool**, **model**, **dataset**, and **modality**.
+
+#### Tool
 | Skill | Function | Status |
 |------|----------|--------|
-| `eeg-skill` | EEG data loading, preprocessing, feature extraction | ✅ |
+| `dependency-planner` | Dependency planning and safe installation workflow | ✅ |
+| `claw-shell` | Safe shell execution gateway via dedicated session | ✅ |
+| `conda-env-manager` | Conda environment lifecycle management | ✅ |
+| `docker-env-manager` | Docker environment management | ✅ |
+| `dcm2nii` | DICOM → NIfTI conversion with metadata support | ✅ |
+| `nii2dcm` | NIfTI → DICOM conversion for clinical interoperability | ✅ |
 | `mne-eeg-tool` | Base-layer MNE-Python implementation for EEG | ✅ |
-| `freesurfer-tool` | Automated brain surface segmentation and parcellation | ✅ |
+| `fsl-tool` | FSL-based sMRI/fMRI/DWI processing utilities | ✅ |
+| `fmriprep-tool` | fMRIPrep pipeline wrapper and execution | ✅ |
+| `qsiprep-tool` | qsiPrep pipeline wrapper for diffusion MRI | ✅ |
+| `hcppipeline-tool` | HCP-style processing pipeline utilities | ✅ |
+| `dipy-tool` | Diffusion MRI processing via DIPY | ✅ |
+| `nilearn-tool` | Fast neuroimaging feature extraction and decoding prep | ✅ |
+| `conn-tool` | Functional connectivity computation and analysis | ✅ |
+| `freesurfer-tool` | FreeSurfer-based MRI processing and segmentation | ✅ |
+| `bids-organizer` | Base skill for organizing raw data into BIDS structure | ✅ |
+| `auto-qc` | Automated quality control for newly added skills | ⏳ |
+| `multi-search-engine` | Multi-engine web search without API keys | ✅ |
+| `academic-research-hub` | Multi-source academic search and paper retrieval | ✅ |
+| `git-essentials` | Core Git commands for collaboration | ✅ |
+| `git-workflows` | Advanced Git workflows (rebase/worktree/bisect) | ✅ |
+| `overleaf-skill` | Overleaf sync and collaborative manuscript operations | ✅ |
+
+#### Model
+| Skill | Function | Status |
+|------|----------|--------|
 | `wmh-segmentation` | White matter hyperintensity segmentation (MARS-WMH nnU-Net) | ✅ |
 
-### Data Conversion & Format Tools
+#### Dataset
 | Skill | Function | Status |
 |------|----------|--------|
-| `dcm2nii` | DICOM → NIfTI conversion with quality validation | ✅ |
-| `nii2dcm` | NIfTI → DICOM conversion with metadata preservation | ✅ |
+| `adni-skill` | ADNI dataset automated processing workflow | ⏳ |
+| `hcp-skill` | HCP-YA dataset automated processing workflow | ⏳ |
+| `ukb-skill` | UKB brain imaging automated processing workflow | ⏳ |
 
-### Literature & Knowledge Search
+#### Modality
 | Skill | Function | Status |
 |------|----------|--------|
-| `academic-research-hub` | Multi-source academic paper search and download | ✅ |
-| `arxiv-cli-tools` | Command-line interface for arXiv search and retrieval | ✅ |
-| `multi-search-engine` | Multi-engine web search (17 engines, no API keys needed) | ✅ |
-
-### Version Control & Collaboration
-| Skill | Function | Status |
-|------|----------|--------|
-| `git-essentials` | Basic Git workflows: clone, commit, push, branch | ✅ |
-| `git-workflows` | Advanced Git operations: rebase, bisect, worktree, reflog | ✅ |
+| `eeg-skill` | EEG preprocessing and feature extraction workflows | ✅ |
+| `fmri-skill` | Functional MRI preprocessing and analysis workflows | ✅ |
+| `smri-skill` | Structural MRI preprocessing and analysis workflows | 🏗️ |
+| `dwi-skill` | Diffusion MRI preprocessing and analysis workflows | 🏗️ |
 
 **Legend**: ✅ Implemented | 🏗️ In Development | ⏳ Planned
 
-
----
-
-## Acknowledgment
-
-**NeuroClaw** design is inspired by the following systems and research:
-- **[OpenClaw](https://github.com/openclaw/openclaw)**: Open-source agent framework foundation
-- **BioClaw / STELLA**: Self-Evolving LLM Agents
-- **ClawBio**: End-to-end biological research system (lessons learned while maintaining compatibility)
 
 ---
 
