@@ -1,17 +1,16 @@
 ---
-
 name: research-idea
 description: "Use this skill whenever the user wants to generate or refine a research idea through literature search and discussion. Triggers include: 'research idea', 'brainstorm idea', 'generate idea', 'research-idea', 'idea generation', 'discuss new direction', or any request to explore literature and output to IDEA.md. This skill is the **mandatory interface-layer idea generator** in NeuroClaw: it calls networking search skills to retrieve recent papers, identifies gaps/trends, then iteratively discusses with the user to finalize a structured idea, always saving the result as IDEA.md."
 license: MIT License (NeuroClaw custom skill – freely modifiable within the project)
-
 ---
 
 # Research Idea
+
 ## Overview
 This skill implements the **Literature Search + User Discussion** process for NeuroClaw research-idea phase.
 
 It acts as the Idea Generator within the multi-agent framework:
-- Automatically calls search skills (multi-search-engine, arxiv-search, pubmed-search, web search) for the latest papers (prefer last 3–6 months).
+- Automatically calls search skills (`multi-search-engine`, `academic-research-hub`, etc.) for the latest papers (prefer last 3–6 months).
 - Summarizes key trends, methods, and open gaps.
 - Engages in step-by-step discussion with the user to refine novelty and feasibility.
 - Saves the final structured idea as **IDEA.md** (Background, Gap, Proposed Idea, Methods Outline, Impact).
@@ -21,6 +20,7 @@ If no topic is provided, it first asks the user for a domain (e.g., MRI segmenta
 **Research use only** — the output is a concise, actionable IDEA.md ready for method-design.
 
 ## Quick Reference (Idea Flow)
+
 | Step | Description                  | Output File          |
 |------|------------------------------|----------------------|
 | 1. Search | Call search skills for recent literature | temp_search.md      |
@@ -46,7 +46,8 @@ If no topic is provided, it first asks the user for a domain (e.g., MRI segmenta
 - Before method-design or paper-writing
 
 ## Complementary / Related Skills
-- `multi-search-engine` / `arxiv-search` → core literature retrieval
+- `multi-search-engine` → core web & general literature retrieval
+- `academic-research-hub` → arXiv, PubMed, Semantic Scholar paper search
 - `method-design` → consumes IDEA.md
 - `paper-writing` → consumes IDEA.md
 - `experiment-controller` → follows finalized idea
@@ -54,6 +55,7 @@ If no topic is provided, it first asks the user for a domain (e.g., MRI segmenta
 ## Reference & Source
 NeuroClaw architecture (section 1.4 research survey skill).  
 Flow: search → gap analysis → proposal → user discussion → IDEA.md  
-Created At: 2026-03-24  
-Last Updated At: 2026-03-24  
+
+Created At: 2026-03-24  20:00 HKT
+Last Updated At: 2026-03-26 00:28 HKT  
 Author: chengwang96

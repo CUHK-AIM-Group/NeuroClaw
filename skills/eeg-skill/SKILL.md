@@ -8,9 +8,9 @@ license: MIT License (NeuroClaw custom skill – freely modifiable within the pr
 
 ## Overview
 
-`eeg-skill` is the NeuroClaw **modality-layer** interface skill responsible for all EEG data processing tasks.
-
+`eeg-skill` is the NeuroClaw **modality-layer** interface skill responsible for all EEG data processing tasks.  
 It strictly follows the NeuroClaw hierarchical design principles:
+
 - This skill **only describes WHAT needs to be done** and **which tool skill to delegate to**.
 - It contains **no full implementation code**.
 - All concrete execution (MNE-Python calls, torchaudio, scipy, file I/O, etc.) is delegated to the dedicated base/tool skill `mne-eeg-tool`.
@@ -18,6 +18,7 @@ It strictly follows the NeuroClaw hierarchical design principles:
 - Frequency-band energy extraction uses continuous wavelet transform (`scipy.signal.cwt` with `morlet2` wavelet).
 
 **Core workflow (never bypassed):**
+
 1. Identify the user-provided EEG files (BIDS, .set, .edf, .bdf, .fif, etc.).
 2. Generate a **numbered execution plan** that clearly states WHAT needs to be done and which tool skill will handle each step.
 3. Present the full plan, estimated runtime, resource requirements, and risks to the user and wait for explicit confirmation (“YES” / “execute” / “proceed”).
@@ -57,12 +58,12 @@ import torch
 import torchaudio.transforms as T
 
 mel_spec = T.MelSpectrogram(
-    sample_rate=256,      # 根据你的 EEG 采样率调整
+    sample_rate=256,      # Adjust according to your EEG sampling rate
     n_fft=1024,
     hop_length=256,
     n_mels=128,
     f_min=0.5,
-    f_max=60.0            # EEG 常用频率范围
+    f_max=60.0            # Common EEG frequency range
 )
 spectrogram = mel_spec(waveform)   # waveform shape: (channels, time)
 
@@ -71,12 +72,12 @@ import numpy as np
 from scipy.signal import cwt, morlet2
 
 def extract_band_power(signal, fs=256):
-    widths = np.arange(1, 128)  # 根据频率范围调整
+    widths = np.arange(1, 128)  # Adjust according to frequency range
     cwt_matrix = cwt(signal, morlet2, widths)
     
-    # 示例：提取 delta (0.5-4 Hz), theta (4-8 Hz), alpha (8-13 Hz), beta (13-30 Hz), gamma (30-60 Hz)
+    # Example: extract delta (0.5-4 Hz), theta (4-8 Hz), alpha (8-13 Hz), beta (13-30 Hz), gamma (30-60 Hz)
     delta_power = np.mean(np.abs(cwt_matrix[low_idx:high_idx])**2, axis=0)
-    # ... 类似处理其他频段
+    # ... similar processing for other bands
     return band_powers
 ```
 
@@ -99,12 +100,14 @@ def extract_band_power(signal, fs=256):
 - `dependency-planner` + `conda-env-manager` → environment and package installation (MNE-Python + torchaudio + scipy)
 - `claw-shell` → all actual execution
 - `mne-eeg-tool` → base/tool layer that contains all specific implementation code
+- `dcm2nii` → convert clinical EEG DICOM series to NIfTI/EDF when raw data arrives in DICOM format
 
 ## Reference & Source
 
-Aligned with NeuroClaw modality-skill pattern (see `freesurfer-processor`, `wmh-segmentation`, etc.).  
+Aligned with NeuroClaw modality-skill pattern (see `freesurfer-tool`, `wmh-segmentation`, etc.).  
 Core libraries: MNE-Python (main), `torchaudio.transforms.MelSpectrogram` (waveform to spectrogram), `scipy.signal.cwt` + `morlet2` (frequency band energy extraction).
 
+---
 Created At: 2026-03-25 16:00 HKT  
-Last Updated At: 2026-03-25 16:00 HKT  
+Last Updated At: 2026-03-25 22:07 HKT  
 Author: Cheng Wang

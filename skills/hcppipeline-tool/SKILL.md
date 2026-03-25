@@ -7,7 +7,6 @@ license: MIT License (NeuroClaw custom skill – freely modifiable within the pr
 # HCP Pipeline Tool
 
 ## Overview
-
 The HCP Pipelines are the official, highly optimized preprocessing pipelines developed by the Human Connectome Project. They provide state-of-the-art processing for structural (T1w/T2w), functional (task/resting-state fMRI with ICA-FIX), and diffusion MRI (topup + eddy + bedpostx + probtrackx + MSMAll surface alignment).
 
 This skill serves as the **NeuroClaw interface-layer wrapper** for the HCP Pipelines and strictly follows the hierarchical design:
@@ -26,11 +25,11 @@ This skill serves as the **NeuroClaw interface-layer wrapper** for the HCP Pipel
 
 | Task                              | Recommended Pipeline Stage                          | Typical Runtime (per subject) |
 |-----------------------------------|-----------------------------------------------------|-------------------------------|
-| Structural preprocessing          | PreFreeSurfer + FreeSurfer + PostFreeSurfer         | 4–12 hours                   |
-| Functional preprocessing          | fMRIVolume + fMRISurface + ICA-FIX                  | 2–6 hours                    |
-| Diffusion preprocessing           | DiffusionPreprocessing + bedpostx + probtrackx      | 6–24 hours                   |
-| Surface-based registration        | MSMAll                                              | 2–4 hours                    |
-| Full HCP-style multimodal pipeline| All stages combined                                 | 12–36+ hours                 |
+| Structural preprocessing          | PreFreeSurfer + FreeSurfer + PostFreeSurfer         | 4–12 hours                    |
+| Functional preprocessing          | fMRIVolume + fMRISurface + ICA-FIX                  | 2–6 hours                     |
+| Diffusion preprocessing           | DiffusionPreprocessing + bedpostx + probtrackx      | 6–24 hours                    |
+| Surface-based registration        | MSMAll                                              | 2–4 hours                     |
+| Full HCP-style multimodal pipeline| All stages combined                                 | 12–36+ hours                  |
 
 ## Common Shell Command Examples
 
@@ -56,9 +55,7 @@ ${HCPPIPEDIR}/DiffusionPreprocessing/DiffusionPreprocessing.sh \
 ```
 
 ## Installation (Handled by dependency-planner)
-
 Use `dependency-planner` with one of the following requests:
-
 - “Install official HCP Pipelines from GitHub”
 - “Install HCP Pipelines and dependencies (FSL, FreeSurfer, CUDA if needed)”
 
@@ -73,7 +70,6 @@ echo $HCPPIPEDIR
 - Sufficient disk space (20–100 GB per subject) and RAM (≥32 GB recommended)
 
 ## NeuroClaw recommended wrapper script
-
 ```python
 # hcppipeline_wrapper.py (placed inside the skill folder for reference)
 import subprocess
@@ -101,7 +97,6 @@ if __name__ == "__main__":
 ```
 
 ## Important Notes & Limitations
-
 - All actual pipeline execution is routed through `claw-shell` due to extremely long runtimes.
 - HCP Pipelines are very resource-intensive and disk-heavy.
 - Requires well-organized input data (preferably BIDS via `bids-organizer` first).
@@ -109,31 +104,23 @@ if __name__ == "__main__":
 - Surface-based MSMAll registration provides superior alignment compared to volume-based methods.
 
 ## When to Call This Skill
-
 - User wants the highest-quality, HCP-style preprocessing for multimodal data.
 - When research requires accurate surface-based alignment, ICA-FIX cleaned resting-state fMRI, or advanced diffusion modeling.
 - After `bids-organizer` when preparing data for connectomics or high-precision analysis.
 
 ## Complementary / Related Skills
-
 - `bids-organizer` → organize raw data into BIDS before running HCP
 - `fmriprep-tool` → lighter and faster alternative to HCP preprocessing
 - `fsl-tool` → post-HCP connectivity and ROI analysis
 - `fmri-skill` → high-level modality layer that can delegate to this tool
 - `dependency-planner` → install HCP Pipelines and dependencies
 - `claw-shell` → safe execution of long-running pipelines
+- `multi-search-engine` / `academic-research-hub` → retrieve latest HCP best practices
 
-## More Advanced Features
-
-For full documentation and advanced options (custom templates, multi-run processing, etc.):
-
-- Official HCP Pipelines GitHub: https://github.com/Washington-University/HCPpipelines
-- HCP User Guide: https://www.humanconnectome.org/storage/app/media/documentation/Pipelines_Release_Notes.pdf
-
-You may use the `multi-search-engine` or `academic-research-hub` skill to retrieve the latest HCP best practices.
-
----
+## Reference & Source
+Official HCP Pipelines integration for NeuroClaw high-precision multimodal preprocessing.  
+Official repository: https://github.com/Washington-University/HCPpipelines
 
 Created At: 2026-03-25 19:30 HKT  
-Last Updated At: 2026-03-25 19:30 HKT  
-Author: Cheng Wang
+Last Updated At: 2026-03-26 00:12 HKT  
+Author: chengwang96

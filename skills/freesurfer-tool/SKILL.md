@@ -1,41 +1,41 @@
 ---
-
 name: freesurfer-tool
 description: "Use this skill whenever the user wants to process structural MRI data (T1w, T2w, FLAIR, etc.) with FreeSurfer, especially for cortical/subcortical segmentation, surface reconstruction, parcellation, cortical thickness, volume statistics, or full recon-all pipeline. Triggers include: 'freesurfer', 'recon-all', 'segment MRI', 'FreeSurfer processing', 'cortical segmentation', 'subcortical segmentation', 'run recon-all', 'freesurfer T1', 'process brain MRI with freesurfer', 'aseg aparc', or any request to run FreeSurfer on NIfTI MRI data for research analysis."
 license: MIT License (NeuroClaw custom skill – freely modifiable within the project)
-
 ---
 
-# FreeSurfer Processor
+# FreeSurfer Tool
 
 ## Overview
 
-FreeSurfer is the gold-standard open-source suite for automated reconstruction of the brain’s cortical surface from structural MRI, including skull-stripping, intensity normalization, Talairach registration, cortical parcellation (Desikan-Killiany / Destrieux atlases), subcortical segmentation (aseg), surface mesh generation, cortical thickness estimation, and statistics.
+FreeSurfer is the gold-standard open-source suite for automated reconstruction of the brain’s cortical surface from structural MRI, including skull-stripping, intensity normalization, Talairach registration, cortical parcellation (Desikan-Killiany / Destrieux atlases), subcortical segmentation (`aseg`), surface mesh generation, cortical thickness estimation, and statistics.
 
 This skill serves as the **NeuroClaw interface-layer wrapper** for FreeSurfer and strictly follows the hierarchical design:
 
-1. Check whether FreeSurfer is installed (`recon-all --version`, `$FREESURFER_HOME` environment variable).
-2. If not found → immediately invoke `dependency-planner` to plan and (after user confirmation) install the latest stable FreeSurfer release + license setup.
-3. Collect and confirm: input NIfTI file(s), subject ID, output SUBJECTS_DIR, desired stages/flags (e.g. -all, -autorecon1..3, -T2, -FLAIR, -parallel).
-4. Generate a clear, numbered execution plan including exact shell commands.
-5. Present plan, estimated runtime, disk/RAM requirements, and risks → wait for explicit user confirmation (“YES” / “execute” / “proceed”).
-6. On confirmation → delegate all shell command execution to the `claw-shell` skill (environment setup, recon-all invocation, logging, progress monitoring).
+1. Check whether FreeSurfer is installed (`recon-all --version`, `$FREESURFER_HOME` environment variable).  
+2. If not found → immediately invoke `dependency-planner` to plan and (after user confirmation) install the latest stable FreeSurfer release + license setup.  
+3. Collect and confirm: input NIfTI file(s), subject ID, output `SUBJECTS_DIR`, desired stages/flags (e.g. `-all`, `-autorecon1..3`, `-T2`, `-FLAIR`, `-parallel`).  
+4. Generate a clear, numbered execution plan including exact shell commands.  
+5. Present plan, estimated runtime, disk/RAM requirements, and risks → wait for explicit user confirmation (“YES” / “execute” / “proceed”).  
+6. On confirmation → delegate **all** shell command execution to the `claw-shell` skill (environment setup, `recon-all` invocation, logging, progress monitoring).  
 7. Report completion status, log location, output directory, and next steps.
 
 **Key design principle (2026 update)**: No direct `subprocess.run()` calls for long-running FreeSurfer commands. All shell execution is routed through `claw-shell` for centralized logging, timeout handling, real-time output streaming, and interruption safety.
 
+**Research use only.**
+
 ## Quick Reference (Common Use Cases)
 
-| Task                              | Recommended recon-all flags / approach                          |
-|-----------------------------------|-----------------------------------------------------------------|
-| Full pipeline (most common)       | `-all`                                                          |
-| Fast subcortical + basic surfaces | `-autorecon1 -autorecon2 -autorecon3`                           |
-| Cortical surfaces & parcellation  | `-autorecon2 -autorecon3` (after autorecon1 completed)          |
-| Improve pial surface with T2      | `-T2 T2w.nii.gz`                                                |
-| Use FLAIR for better segmentation | `-FLAIR FLAIR.nii.gz`                                           |
-| Enable multi-core acceleration    | `-parallel -openmp 8` (or match available cores)                |
-| Resume interrupted run            | Omit `-i` and `-all`, specify stages only                       |
-| Generate statistics only          | `-stats`                                                        |
+| Task                              | Recommended `recon-all` flags / approach                          |
+|-----------------------------------|-------------------------------------------------------------------|
+| Full pipeline (most common)       | `-all`                                                            |
+| Fast subcortical + basic surfaces | `-autorecon1 -autorecon2 -autorecon3`                             |
+| Cortical surfaces & parcellation  | `-autorecon2 -autorecon3` (after `autorecon1` completed)          |
+| Improve pial surface with T2      | `-T2 T2w.nii.gz`                                                  |
+| Use FLAIR for better segmentation | `-FLAIR FLAIR.nii.gz`                                             |
+| Enable multi-core acceleration    | `-parallel -openmp 8` (or match available cores)                  |
+| Resume interrupted run            | Omit `-i` and `-all`, specify stages only                         |
+| Generate statistics only          | `-stats`                                                          |
 
 ## Installation Check & Setup
 
@@ -48,9 +48,9 @@ When FreeSurfer is not detected:
 - This skill then verifies `$FREESURFER_HOME` and `recon-all` availability
 
 **Prerequisites**:
-- `dependency-planner` (mandatory for installation)
-- `claw-shell` (mandatory for command execution)
-- Valid FreeSurfer academic license (free registration required)
+- `dependency-planner` (mandatory for installation)  
+- `claw-shell` (mandatory for command execution)  
+- Valid FreeSurfer academic license (free registration required)  
 - ≥16 GB RAM recommended (32 GB+ strongly preferred for `-all`)
 
 ## NeuroClaw recommended wrapper script
@@ -107,7 +107,6 @@ def main():
 
     # Build shell commands
     commands = []
-
     # 1. Set environment
     fs_home = "/usr/local/freesurfer"  # typical default; adjust if needed
     commands.append(f"export FREESURFER_HOME={fs_home}")
@@ -175,24 +174,25 @@ if __name__ == "__main__":
 
 ## Important Notes & Limitations
 
-- All actual shell command execution is delegated to `claw-shell` (no direct `subprocess` calls for recon-all)
-- Full `-all` pipeline is very long-running → `claw-shell` should support background/detached mode or long timeouts
-- Input must be NIfTI (.nii or .nii.gz); convert DICOM first using `dcm2nii` skill
-- Output follows standard FreeSurfer structure: `$SUBJECTS_DIR/<subjid>`
-- Windows users: strongly recommended to use WSL2 (installation handled by `dependency-planner`)
-- License check: skill assumes license.txt is already in place after `dependency-planner` run
+- All actual shell command execution is delegated to `claw-shell` (no direct `subprocess` calls for `recon-all`).  
+- Full `-all` pipeline is very long-running → `claw-shell` should support background/detached mode or long timeouts.  
+- Input must be NIfTI (`.nii` or `.nii.gz`); convert DICOM first using `dcm2nii` skill.  
+- Output follows standard FreeSurfer structure: `$SUBJECTS_DIR/<subjid>`.  
+- Windows users: strongly recommended to use WSL2 (installation handled by `dependency-planner`).  
+- License check: skill assumes `license.txt` is already in place after `dependency-planner` run.
 
 ## When to Call This Skill
 
-- User provides structural MRI (NIfTI) and wants automated FreeSurfer processing
-- Any mention of recon-all, aseg, aparc, cortical thickness, surface reconstruction, or FreeSurfer statistics
+- User provides structural MRI (NIfTI) and wants automated FreeSurfer processing.  
+- Any mention of `recon-all`, `aseg`, `aparc`, cortical thickness, surface reconstruction, or FreeSurfer statistics.
 
 ## Complementary / Related Skills
 
-- `dcm2nii`              → convert DICOM to NIfTI input
-- `dependency-planner`   → install FreeSurfer + license
-- `claw-shell`           → safe execution of long-running shell commands
-- `conda-env-manager`    → manage Python environment for post-processing FreeSurfer outputs
+- `dcm2nii` → convert DICOM to NIfTI input  
+- `dependency-planner` → install FreeSurfer + license  
+- `claw-shell` → safe execution of long-running shell commands  
+- `conda-env-manager` → manage Python environment for post-processing FreeSurfer outputs  
+- `fmriprep-tool` → can feed preprocessed data into FreeSurfer (via `--fs-subjects-dir`)
 
 ## Reference & Source
 
@@ -203,6 +203,8 @@ Documentation: https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferWiki
 
 Custom NeuroClaw skill created to integrate FreeSurfer safely into the hierarchical skill structure.
 
-Created At: 2026-03-19  
-Last Updated At: 2026-03-19 
+---
+
+Created At: 2026-03-19 20:00 HKT  
+Last Updated At: 2026-03-25 23:46 HKT  
 Author: chengwang96

@@ -1,8 +1,6 @@
 ---
-
 name: "multi-search-engine"
 description: "Multi search engine integration with 17 engines (8 CN + 9 Global). Supports advanced search operators, time filters, site search, privacy engines, and WolframAlpha knowledge queries. No API keys required."
-
 ---
 
 # Multi Search Engine v2.0.1
@@ -59,26 +57,25 @@ web_fetch({"url": "https://www.wolframalpha.com/input?i=100+USD+to+CNY"})
 
 ## Advanced Operators
 
-| Operator | Example | Description |
-|----------|---------|-------------|
-| `site:` | `site:github.com python` | Search within site |
-| `filetype:` | `filetype:pdf report` | Specific file type |
-| `""` | `"machine learning"` | Exact match |
-| `-` | `python -snake` | Exclude term |
-| `OR` | `cat OR dog` | Either term |
+| Operator | Example                  | Description          |
+|----------|--------------------------|----------------------|
+| `site:`  | `site:github.com python` | Search within site   |
+| `filetype:` | `filetype:pdf report` | Specific file type   |
+| `""`     | `"machine learning"`     | Exact match          |
+| `-`      | `python -snake`          | Exclude term         |
+| `OR`     | `cat OR dog`             | Either term          |
 
 ## Time Filters
 
-| Parameter | Description |
-|-----------|-------------|
-| `tbs=qdr:h` | Past hour |
-| `tbs=qdr:d` | Past day |
-| `tbs=qdr:w` | Past week |
-| `tbs=qdr:m` | Past month |
-| `tbs=qdr:y` | Past year |
+| Parameter   | Description |
+|-------------|-------------|
+| `tbs=qdr:h` | Past hour   |
+| `tbs=qdr:d` | Past day    |
+| `tbs=qdr:w` | Past week   |
+| `tbs=qdr:m` | Past month  |
+| `tbs=qdr:y` | Past year   |
 
 ## Privacy Engines
-
 - **DuckDuckGo**: No tracking
 - **Startpage**: Google results + privacy
 - **Brave**: Independent index
@@ -86,27 +83,35 @@ web_fetch({"url": "https://www.wolframalpha.com/input?i=100+USD+to+CNY"})
 
 ## Bangs Shortcuts (DuckDuckGo)
 
-| Bang | Destination |
-|------|-------------|
-| `!g` | Google |
-| `!gh` | GitHub |
-| `!so` | Stack Overflow |
-| `!w` | Wikipedia |
-| `!yt` | YouTube |
+| Bang | Destination     |
+|------|-----------------|
+| `!g` | Google          |
+| `!gh`| GitHub          |
+| `!so`| Stack Overflow  |
+| `!w` | Wikipedia       |
+| `!yt`| YouTube         |
 
 ## WolframAlpha Queries
-
 - Math: `integrate x^2 dx`
 - Conversion: `100 USD to CNY`
 - Stocks: `AAPL stock`
 - Weather: `weather in Beijing`
 
 ## Documentation
-
 - `references/advanced-search.md` - Domestic search guide
 - `references/international-search.md` - International search guide
 - `CHANGELOG.md` - Version history
 
 ## License
-
 MIT
+
+## Complementary / Related Skills
+- `academic-research-hub` → scholarly paper search
+
+## Reference & Source
+Core multi-engine search integration for NeuroClaw (v2.0.1).  
+Used as the primary literature & web search backend across all interface-layer skills.
+
+Created At: 2026-03-24  
+Last Updated At: 2026-03-26 00:18 HKT  
+Author: chengwang96

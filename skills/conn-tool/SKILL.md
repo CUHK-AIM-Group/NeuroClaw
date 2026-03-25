@@ -109,6 +109,7 @@ if __name__ == "__main__":
 - CONN Documentation: https://web.conn-toolbox.org/documentation
 - Aligned with NeuroClaw modality-skill pattern (see `fmri-skill`, `eeg-skill`).
 
+---
 Created At: 2026-03-25 16:10 HKT  
 Last Updated At: 2026-03-25 16:10 HKT  
 Author: Cheng Wang

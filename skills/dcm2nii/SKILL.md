@@ -5,7 +5,9 @@ license: BSD 3-Clause (original dcm2niix license). See https://github.com/rorden
 ---
 
 # DICOM to NIfTI conversion
+
 ## Overview
+
 DICOM is the universal clinical imaging format containing rich metadata, patient information, acquisition parameters, and often multi-slice series.  
 NIfTI (.nii/.nii.gz) is the de-facto standard in neuroimaging research — compact, orientation-aware, and directly supported by FSL, FreeSurfer, SPM, AFNI, ANTs, etc.
 
@@ -17,16 +19,16 @@ It produces high-fidelity 3D/4D NIfTI volumes + comprehensive JSON sidecar files
 ## Quick Reference
 
 | Task                              | Recommended Flags / Approach                          |
-|-----------------------------------|--------------------------------------------------------|
-| Basic single-series conversion    | `dcm2niix -z y -o output/ dicom_folder/`              |
-| 4D fMRI/DWI/perfusion             | `dcm2niix -z y -f "%s_%t" -b y dicom_folder/`         |
-| BIDS-like naming + JSON sidecar   | `-o out/ -f sub-%s_ses-%t -z y -b y`                  |
-| Lossless compression              | `-z y` (pigz) or `-z i` (internal)                    |
-| Anonymize (remove most PHI)       | `-x y` (cautious) or `-x n` (aggressive)              |
+|-----------------------------------|-------------------------------------------------------|
+| Basic single-series conversion    | `dcm2niix -z y -o output/ dicom_folder/`             |
+| 4D fMRI/DWI/perfusion             | `dcm2niix -z y -f "%s_%t" -b y dicom_folder/`        |
+| BIDS-like naming + JSON sidecar   | `-o out/ -f sub-%s_ses-%t -z y -b y`                 |
+| Lossless compression              | `-z y` (pigz) or `-z i` (internal)                   |
+| Anonymize (remove most PHI)       | `-x y` (cautious) or `-x n` (aggressive)             |
 | Merge 2D slices into 3D volume    | default behavior (auto-detected)                      |
 | Keep slice timing / Philips diff  | `-t y` (important for fMRI)                           |
-| Custom output filename            | `-f "%p_%s_%t_%d"` (patient_study_time_desc)          |
-| Only convert specific series      | Use `-m y` + manual selection or post-filter          |
+| Custom output filename            | `-f "%p_%s_%t_%d"` (patient_study_time_desc)         |
+| Only convert specific series      | Use `-m y` + manual selection or post-filter         |
 
 ## Installation
 
@@ -167,6 +169,7 @@ Documentation: https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage
 Maintainer: Chris Rorden  
 Core algorithm: dicom → NIfTI reorientation + private tag parsing
 
+---
 Created At: 2026-03-18 20:55 HKT  
-Last Updated At: 2026-03-18 20:55 HKT  
+Last Updated At: 2026-03-25 20:53 HKT  
 Author: chengwang96

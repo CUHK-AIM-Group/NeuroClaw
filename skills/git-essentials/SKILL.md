@@ -7,10 +7,15 @@ metadata: {"clawdbot":{"emoji":"🌳","requires":{"bins":["git"]}}}
 
 # Git Essentials
 
-Essential Git commands for version control and collaboration.
+## Overview
+
+`git-essentials` is the **NeuroClaw base skill** for all version control operations. It provides the essential Git commands for initializing repositories, staging, committing, branching, merging, working with remotes, viewing history, undoing changes, stashing, rebasing, tagging, and common daily workflows.
+
+This skill serves as the foundation for any project that requires reproducible code management, experiment tracking, or collaboration inside NeuroClaw.
+
+**Research use only** — always combine with `git-workflows` for advanced operations.
 
 ## Initial Setup
-
 ```bash
 # Configure user
 git config --global user.name "Your Name"
@@ -34,7 +39,7 @@ git status
 # Add files to staging
 git add file.txt
 git add .
-git add -A  # All changes including deletions
+git add -A   # All changes including deletions
 
 # Commit changes
 git commit -m "Commit message"
@@ -44,7 +49,7 @@ git commit -am "Message"
 
 # Amend last commit
 git commit --amend -m "New message"
-git commit --amend --no-edit  # Keep message
+git commit --amend --no-edit   # Keep message
 ```
 
 ### Viewing changes
@@ -68,14 +73,14 @@ git diff commit1 commit2
 ```bash
 # List branches
 git branch
-git branch -a  # Include remote branches
+git branch -a   # Include remote branches
 
 # Create branch
 git branch feature-name
 
 # Switch branch
 git checkout feature-name
-git switch feature-name  # Modern alternative
+git switch feature-name   # Modern alternative
 
 # Create and switch
 git checkout -b feature-name
@@ -83,7 +88,7 @@ git switch -c feature-name
 
 # Delete branch
 git branch -d branch-name
-git branch -D branch-name  # Force delete
+git branch -D branch-name   # Force delete
 
 # Rename branch
 git branch -m old-name new-name
@@ -192,7 +197,7 @@ git bisect good commit-hash
 ```bash
 # Discard changes in file
 git restore file.txt
-git checkout -- file.txt  # Old way
+git checkout -- file.txt   # Old way
 
 # Discard all changes
 git restore .
@@ -202,7 +207,7 @@ git restore .
 ```bash
 # Unstage file
 git restore --staged file.txt
-git reset HEAD file.txt  # Old way
+git reset HEAD file.txt   # Old way
 
 # Unstage all
 git reset
@@ -224,7 +229,6 @@ git reset --hard commit-hash
 ```
 
 ## Stashing
-
 ```bash
 # Stash changes
 git stash
@@ -252,7 +256,6 @@ git stash clear
 ```
 
 ## Rebasing
-
 ```bash
 # Rebase current branch
 git rebase main
@@ -271,7 +274,6 @@ git rebase --abort
 ```
 
 ## Tags
-
 ```bash
 # List tags
 git tag
@@ -389,7 +391,6 @@ Add to `~/.gitconfig`:
 ```
 
 ## Tips
-
 - Commit often, perfect later (interactive rebase)
 - Write meaningful commit messages
 - Use `.gitignore` for files to exclude
@@ -421,11 +422,28 @@ git commit --amend -m "Correct message"
 ```bash
 # Edit files to resolve conflicts
 git add resolved-files
-git commit  # Or git merge --continue
+git commit   # Or git merge --continue
 ```
 
-## Documentation
+## When to Call This Skill
+- Any time you need basic version control inside NeuroClaw
+- Before running `git-workflows` for advanced operations
+- When managing experiment code, paper drafts, or data processing scripts
+- After `dependency-planner` installs new tools that require Git
 
-Official docs: https://git-scm.com/doc
-Pro Git book: https://git-scm.com/book
+## Complementary / Related Skills
+- `git-workflows` → advanced operations (rebase, bisect, worktree, sparse checkout, etc.)
+- `dependency-planner` → often uses Git to clone repositories
+- `claw-shell` → all Git commands are safely executed through claw-shell
+- `experiment-controller` → clones and manages experiment repositories
+
+## Reference & Source
+Official docs: https://git-scm.com/doc  
+Pro Git book: https://git-scm.com/book  
 Visual Git guide: https://marklodato.github.io/visual-git-guide/
+
+---
+
+Created At: 2026-03-19 00:00 HKT  
+Last Updated At: 2026-03-25 23:57 HKT  
+Author: Cheng Wang

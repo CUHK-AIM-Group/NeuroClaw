@@ -60,7 +60,7 @@ claw_shell_run with command="ls -la /data"
 # Returns captured tmux pane output directly to the agent
 ```
 
-### Example 2: FreeSurfer environment + recon-all (delegated from freesurfer-processor)
+### Example 2: FreeSurfer environment + recon-all (delegated from freesurfer-tool)
 
 ```text
 # Internal commands sent to claw-shell:
@@ -110,7 +110,7 @@ if __name__ == "__main__":
 
 ## When to Call This Skill
 
-- Any skill (`freesurfer-processor`, `dependency-planner`, `git-essentials`, etc.) needs to run shell commands.
+- Any skill (`freesurfer-tool`, `dependency-planner`, `git-essentials`, etc.) needs to run shell commands.
 - Post-installation environment variable setup.
 - File operations, log checking, or any terminal action inside NeuroClaw.
 
@@ -125,7 +125,6 @@ if __name__ == "__main__":
 Custom core skill designed for NeuroClaw to provide safe, tmux-based shell execution while solving the dependency and long-running command issues from the MedicalClaw evaluation.
 
 ---
-
 Created At: 2026-03-19 20:00 HKT  
 Last Updated At: 2026-03-25 16:22 HKT  
 Author: Cheng Wang

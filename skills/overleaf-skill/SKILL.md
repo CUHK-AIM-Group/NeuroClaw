@@ -1,15 +1,12 @@
 ---
-
 name: overleaf-skill
 description: "Use this skill whenever the user wants to synchronize NeuroClaw-generated LaTeX manuscripts with Overleaf, read/write .tex files, download/upload projects, create/rename/archive projects, compare versions, or manage project structure. Triggers include: 'sync to Overleaf', 'upload paper to Overleaf', 'Overleaf project', 'LaTeX sync', 'push draft', 'download Overleaf', 'create Overleaf project', 'tex file to Overleaf', or any request involving paper_draft.tex / collaboration. This skill is the **mandatory interface-layer LaTeX collaborator** in NeuroClaw: it strictly enforces pull-first workflow with diff reporting and per-operation user authorization for any write/create/delete action, uses pyoverleaf (cookie-based), preserves Overleaf version history, integrates directly after paper-writing, and never performs unauthorized modifications."
 license: MIT License (NeuroClaw custom skill – freely modifiable within the project)
-
 ---
 
 # Overleaf Skill
 
 ## Overview
-
 This skill provides secure, audited access to Overleaf projects using the pyoverleaf library (Python API + CLI), enabling full round-trip collaboration for NeuroClaw manuscripts.
 
 Role in NeuroClaw multi-agent system:
@@ -79,7 +76,6 @@ This will raise an `AssertionError` in current pyoverleaf versions because the m
 - For self-hosted Overleaf: set `export PYOVERLEAF_HOST=your-domain.com`
 
 ## Quick Workflows (NeuroClaw Integrated)
-
 1. After `paper-writing` finishes → suggest: “Would you like to sync paper_draft.tex to Overleaf? (pull-first recommended)”
 2. Pull & Review → download ZIP → unzip to /tmp → diff local files → summarize changes → ask: “Merge changes? Overwrite local? Cancel?”
 3. Authorized Push → user explicitly says “yes push”, “overwrite Overleaf”, etc. → one-time authorization → use ProjectIO or upload_file → report success + link to Overleaf history
@@ -87,7 +83,6 @@ This will raise an `AssertionError` in current pyoverleaf versions because the m
 5. Full Sync → pull latest → apply NeuroClaw edits locally → authorized push
 
 ## Installation (in NeuroClaw environment)
-
 ```bash
 # Install pyoverleaf in isolated environment
 pip install pyoverleaf
@@ -105,7 +100,6 @@ Example:
 ```bash
 /home/cwang/anaconda3/envs/claw/bin/python script.py
 ```
-
 Do not assume `python3` points to the intended environment.
 
 ### 2. Avoid approval-loop pain by not using inline heredoc Python for Overleaf writes
@@ -115,104 +109,55 @@ python3 - <<'PY'
 ...
 PY
 ```
-can repeatedly trigger fresh approval prompts because they are treated as interpreter/runtime commands with conservative approval semantics. Even if the user clicks approval in the popup, re-running the command creates a new approval request.
-
-**Preferred pattern:**
-- write a real local script file first
-- run that script file with the exact intended Python interpreter
-- split read-only checks and write operations into separate steps
-
-Recommended flow:
-1. write `overleaf_login_check.py`
-2. run read-only login/list-projects check
-3. write `overleaf_upload_only.py`
-4. run upload only after explicit user authorization
-
-This reduces approval churn and makes failures easier to diagnose.
+can repeatedly trigger fresh approval prompts.  
+**Preferred pattern:** write a real local script file first, run it with the exact Python interpreter, and split read-only checks from write operations.
 
 ### 3. Separate read-only checks from write actions
 Before any create/upload/delete action:
-- first verify `pyoverleaf` import
-- then verify login
-- then verify the target project exists
-- only then perform write actions
+- Verify `pyoverleaf` import
+- Verify login
+- Verify the target project exists
+- Then perform write actions
 
-This isolates:
-- environment issues
-- authentication issues
-- project lookup issues
-- upload API issues
+### 4. Project creation is not reliably supported
+Safest default: ask the user to create a blank Overleaf project via the web UI first, then upload into the existing project.
 
-### 4. Project creation is not reliably supported by current pyoverleaf deployments
-Even if the skill conceptually supports project creation, the installed `pyoverleaf.Api` may not expose `new_project` or `create_project`.
-
-Observed behavior in real usage:
-- login worked
-- listing projects worked
-- project creation was **unsupported by pyoverleaf Api**
-
-Therefore, the safest default remains:
-- **ask the user to create a blank Overleaf project via the web UI first**
-- then use the skill to upload files into that existing project
-
-### 5. Upload requires a real folder id, not `None`
-Calling:
-```python
-api.project_upload_file(project_id, None, filename, file_bytes)
-```
-may fail with:
-- HTTP 422
-
-The correct approach is:
-1. call `api.project_get_files(project_id)`
-2. retrieve the returned root folder id
-3. pass that folder id into `project_upload_file`
-
-Correct pattern:
+### 5. Upload requires a real folder id
 ```python
 root_folder = api.project_get_files(project_id)
 folder_id = root_folder.id
 api.project_upload_file(project_id, folder_id, filename, file_bytes)
 ```
 
-### 6. Confirm project existence immediately before upload
-After the user creates a project in the browser, do a fresh read-only project listing again to confirm the new project is visible before attempting upload.
+### 6. Confirm project existence before upload
+Always do a fresh project listing after the user creates a project in the browser.
 
 ### 7. Keep credentials local and temporary
-If a cookie must be written to disk for scripting, keep it in a dedicated local secrets path such as:
-```bash
-.secrets/overleaf_cookie.txt
-```
-and avoid committing it. After the workflow completes, recommend that the user refresh or rotate their browser session cookie.
+Store cookie temporarily in `.secrets/overleaf_cookie.txt` (never commit it). Recommend rotating the browser cookie after use.
 
 ## Safety & Limitations
-
 - **No automatic writes**: Every create/update/delete/rename/push requires explicit single-operation user confirmation.
 - **Cookie must be provided by user**: Agent never assumes or stores credentials long-term.
-- **Version history preserved**: API operations appear in Overleaf History for easy review/revert.
-- **CLI limitations**: Occasional websocket instability → prefer Python API + ProjectIO.
-- **Project creation**: API support is inconsistent across pyoverleaf versions; safest to create blank project via web first, then fill with this skill.
-- **Approval behavior**: On OpenClaw gateway/node exec, write operations may need host approval. Use real script files and split steps to minimize repeated prompts.
+- **Version history preserved**: All API operations appear in Overleaf History.
+- **Project creation**: API support is inconsistent — prefer web UI creation.
+- **Approval behavior**: Use real script files and split steps to minimize repeated prompts.
 
 ## When to Trigger
-
-- Immediately after `paper-writing` completes paper_draft.tex / .md
+- Immediately after `paper-writing` completes `paper_draft.tex` / `.md`
 - User mentions sync / push / pull / Overleaf / create project / LaTeX collaboration
 - During manuscript polishing, arXiv, or journal submission phase
 - When co-authors need an editable Overleaf link
 
 ## Related Skills
-
-- `paper-writing` → generates paper_draft.tex / .md
+- `paper-writing` → generates `paper_draft.tex` / `.md`
 - `claw-shell` → handles unzip / diff / mv / local file ops
 - `dependency-planner` → installs pyoverleaf and LaTeX dependencies
 
 ## References
-
 - pyoverleaf GitHub: https://github.com/jkulhanek/pyoverleaf
 - Original inspiration: Eason’s overleaf-skill workflow
 - Core principle: pull → diff → report → confirm; push only with explicit per-operation authorization
 
-Created At: 2026-03-23  
-Last Updated At: 2026-03-24  
+Created At: 2026-03-23 20:00 HKT  
+Last Updated At: 2026-03-26 00:25 HKT  
 Author: Cheng Wang

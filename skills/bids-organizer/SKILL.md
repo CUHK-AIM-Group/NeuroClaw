@@ -116,7 +116,6 @@ For complex BIDS cases (multi-session, multi-run, custom metadata, HEUDICONV heu
 You may use the `multi-search-engine` or `academic-research-hub` skill to find the latest BIDS conversion best practices.
 
 ---
-
 Created At: 2026-03-25 16:00 HKT  
 Last Updated At: 2026-03-25 16:21 HKT  
 Author: Cheng Wang

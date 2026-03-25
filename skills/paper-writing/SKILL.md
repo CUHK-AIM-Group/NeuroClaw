@@ -7,7 +7,6 @@ license: MIT License (NeuroClaw custom skill – freely modifiable within the pr
 # Paper Writing
 
 ## Overview
-
 This skill implements the exact **Hierarchical Manuscript Drafting and Iterative Refinement** process described in section 4.4 of the NeuroClaw architecture and the accompanying flowchart.
 
 It acts as the Manuscript Composer within an end-to-end multi-agent framework:
@@ -38,13 +37,11 @@ The process preserves narrative coherence, reuses semantic anchors from previous
 | 10. Final Draft Generation | Produce and save the complete manuscript | 10_final_draft.md or 10_final_draft.tex |
 
 ## Installation
-
 ```bash
 # Place files in: skills/paper-writing/
 ```
 
 ## Important Notes & Limitations
-
 - The skill **never** generates the full paper in a single step.
 - Every intermediate step **must** be saved as a separate numbered Markdown file (01_*.md through 10_*.md) to guarantee step-by-step execution in OpenClaw.
 - If LaTeX format is chosen, the skill will ask the user to provide a custom template file. If none is provided, the default IEEE template is used automatically.
@@ -54,24 +51,22 @@ The process preserves narrative coherence, reuses semantic anchors from previous
 - All intermediate files remain in the workspace for inspection, editing, or resumption.
 
 ## When to Call This Skill
-
 - After completing research-idea, method-design, and experiment-controller phases
 - When the user wants a polished manuscript draft from the three core MD files
 - Before final submission to a journal or arXiv
 
 ## Complementary / Related Skills
-
 - `research-idea`         → continuously updates IDEA.md
 - `method-design`         → continuously updates METHOD.md
 - `experiment-controller` → continuously updates EXPERIMENT.md
 - `dependency-planner`    → installs LaTeX dependencies when LaTeX output is selected
 - `claw-shell`            → used internally for LaTeX compilation and file operations
+- `overleaf-skill`        → optional sync of final draft to Overleaf
 
 ## Reference & Source
-
 Hierarchical Manuscript Drafting and Iterative Refinement (section 4.4 of NeuroClaw architecture).  
 Flowchart: multi-agent section generation → ethics review → iterative optimization → narrative writing → de-AI polishing → logic/continuity/length/reference checks → LaTeX repair → final draft.
 
 Created At: 2026-03-23  
-Last Updated At: 2026-03-23  
+Last Updated At: 2026-03-26 00:27 HKT  
 Author: chengwang96

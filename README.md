@@ -140,7 +140,7 @@ NeuroClaw/
 |------|----------|--------|
 | `eeg-skill` | EEG data loading, preprocessing, feature extraction | ✅ |
 | `mne-eeg-tool` | Base-layer MNE-Python implementation for EEG | ✅ |
-| `freesurfer-skill` | Automated brain surface segmentation and parcellation | ✅ |
+| `freesurfer-tool` | Automated brain surface segmentation and parcellation | ✅ |
 | `wmh-segmentation` | White matter hyperintensity segmentation (MARS-WMH nnU-Net) | ✅ |
 
 ### Data Conversion & Format Tools

@@ -7,40 +7,39 @@ license: MIT License (NeuroClaw custom skill – freely modifiable within the pr
 # MNE-EEG Tool (Base/Tool Layer)
 
 ## Overview
-
 `mne-eeg-tool` is the **NeuroClaw base/tool skill** that provides all concrete MNE-Python implementation for EEG processing.
 
 It is **never called directly by the user**. It is exclusively delegated to by the modality-layer skill `eeg-skill` (and any future EEG-related modality skills).
 
 This skill:
-- Contains the complete, ready-to-run MNE-Python code (updated 2026-03-25 to cover all 2026-standard preprocessing and feature extraction tasks).
+- Contains the complete, ready-to-run MNE-Python code (covers all standard preprocessing and feature extraction tasks).
 - Handles environment setup verification.
 - Provides a single, well-documented wrapper script (`eeg_pipeline.py`) that implements **all** common EEG tasks, including the newly added continuous-data branch, functional connectivity, ERP features, frontal alpha asymmetry, and microstate analysis.
 - Routes every execution through `claw-shell` for safety and logging.
 
 **Research use only** — outputs are for scientific analysis.
 
-## Quick Reference (Core Functions – Updated 2026-03-25)
+## Quick Reference (Core Functions)
 
-| Function                          | Purpose                                                                 | New in this update? |
-|-----------------------------------|-------------------------------------------------------------------------|---------------------|
-| `load_eeg()`                      | Load .set / .edf / .bdf / .fif / BIDS + validation                     | —                   |
+| Function                              | Purpose                                                                 | New in this update? |
+|---------------------------------------|-------------------------------------------------------------------------|---------------------|
+| `load_eeg()`                          | Load .set / .edf / .bdf / .fif / BIDS + validation                     | —                   |
 | `detect_and_interpolate_bad_channels()` | Auto-detect + interpolate noisy channels                             | **Yes**             |
-| `preprocess_filtering()`          | Resample + high-pass + notch + bandpass                                 | —                   |
-| `remove_artifacts()`              | ICA + AutoReject + EOG/ECG regression                                   | **Yes**             |
-| `continuous_data_cleaning()`      | Resting-state pipeline (no events)                                      | **Yes**             |
-| `rereference_and_epoch()`         | Average reference + epoching + baseline correction                      | —                   |
-| `extract_frequency_bands()`       | Split into δ/θ/α/β/γ bands + power matrices                             | —                   |
-| `extract_features()`              | Band power, CSP, Hjorth, sample entropy, etc.                           | —                   |
-| `compute_connectivity()`          | PLV, coherence, wPLI, imaginary coherence                               | **Yes**             |
-| `extract_erp_features()`          | Peak amplitude, latency, area under curve                               | **Yes**             |
-| `compute_alpha_asymmetry()`       | Frontal alpha asymmetry (emotion studies)                               | **Yes**             |
-| `run_microstate_analysis()`       | EEG microstates (resting-state)                                         | **Yes**             |
-| `full_eeg_pipeline()`             | One-click end-to-end pipeline (any combination)                         | —                   |
+| `preprocess_filtering()`              | Resample + high-pass + notch + bandpass                                 | —                   |
+| `remove_artifacts()`                  | ICA + AutoReject + EOG/ECG regression                                   | **Yes**             |
+| `continuous_data_cleaning()`          | Resting-state pipeline (no events)                                      | **Yes**             |
+| `rereference_and_epoch()`             | Average reference + epoching + baseline correction                      | —                   |
+| `extract_frequency_bands()`           | Split into δ/θ/α/β/γ bands + power matrices                             | —                   |
+| `extract_features()`                  | Band power, CSP, Hjorth, sample entropy, etc.                           | —                   |
+| `compute_connectivity()`              | PLV, coherence, wPLI, imaginary coherence                               | **Yes**             |
+| `extract_erp_features()`              | Peak amplitude, latency, area under curve                               | **Yes**             |
+| `compute_alpha_asymmetry()`           | Frontal alpha asymmetry (emotion studies)                               | **Yes**             |
+| `run_microstate_analysis()`           | EEG microstates (resting-state)                                         | **Yes**             |
+| `full_eeg_pipeline()`                 | One-click end-to-end pipeline (any combination)                         | —                   |
 
 ## Installation (Handled by dependency-planner)
-
 This skill is automatically installed when `eeg-skill` is used:
+
 ```bash
 # Executed via dependency-planner + conda-env-manager
 conda create -n neuroclaw-eeg python=3.11 -y
@@ -50,7 +49,6 @@ pip install mne[full]  # optional: full extras
 ```
 
 ## NeuroClaw recommended wrapper script
-
 ```python
 # eeg_pipeline.py
 # NeuroClaw MNE-EEG Tool – Full Pipeline (MNE-Python core) – Updated 2026-03-25
@@ -254,23 +252,20 @@ if __name__ == "__main__":
 ```
 
 ## Important Notes & Limitations
-
 - Requires the `neuroclaw-eeg` conda environment (auto-created by `dependency-planner`).
 - Long-running steps (ICA, connectivity, microstates) run safely in `claw` tmux session.
 - Outputs are always written to `./eeg_output/` with clear subfolders.
 - Fully extensible: new functions can be added to `eeg_pipeline.py` without touching `eeg-skill`.
 
 ## Complementary / Related Skills
-
 - `claw-shell` → executes this skill’s wrapper
 - `dependency-planner` + `conda-env-manager` → creates `neuroclaw-eeg` environment
 - `eeg-skill` → modality-layer interface that calls this tool skill
 
 ## Reference & Source
-
 Official MNE-Python documentation (https://mne.tools) + MNE-Connectivity + mne-microstates.  
-Aligned with NeuroClaw base/tool skill pattern (freesurfer-processor, dcm2nii, etc.).  
+Aligned with NeuroClaw base/tool skill pattern (freesurfer-tool, dcm2nii, etc.).
 
 Created At: 2026-03-25 14:00 HKT  
-Last Updated At: 2026-03-25 14:00 HKT  
-Author: Cheng Wang
+Last Updated At: 2026-03-26 00:16 HKT  
+Author: chengwang96

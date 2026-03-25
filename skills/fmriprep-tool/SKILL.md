@@ -24,15 +24,15 @@ This skill serves as the **NeuroClaw interface-layer wrapper** for fMRIPrep and 
 
 ## Quick Reference
 
-| Task                              | Recommended Command / Approach                                      | Typical Runtime (per subject) |
-|-----------------------------------|---------------------------------------------------------------------|-------------------------------|
-| Full fMRIPrep pipeline            | `fmriprep bids_dir output_dir participant --fs-license-file license.txt` | 2–8 hours                    |
-| Anatomical only                   | `--anat-only`                                                       | 30–90 min                    |
-| Functional only (after anat)      | `--bold-only`                                                       | 1–4 hours                    |
-| Use FreeSurfer recon-all          | `--fs-subjects-dir /path/to/fs`                                     | +2–6 hours                   |
-| Skip susceptibility distortion    | `--ignore fieldmaps`                                                | Reduces time                 |
-| Low memory mode                   | `--mem-mb 8000 --nthreads 4`                                        | For limited resources        |
-| Generate detailed QC reports      | Default behavior (outputs in `sub-*/figures/` and `reports/`)       | Included                     |
+| Task                          | Recommended Command / Approach                                      | Typical Runtime (per subject) |
+|-------------------------------|---------------------------------------------------------------------|-------------------------------|
+| Full fMRIPrep pipeline        | `fmriprep bids_dir output_dir participant --fs-license-file license.txt` | 2–8 hours                    |
+| Anatomical only               | `--anat-only`                                                       | 30–90 min                    |
+| Functional only (after anat)  | `--bold-only`                                                       | 1–4 hours                    |
+| Use FreeSurfer recon-all      | `--fs-subjects-dir /path/to/fs`                                     | +2–6 hours                   |
+| Skip susceptibility distortion| `--ignore fieldmaps`                                                | Reduces time                 |
+| Low memory mode               | `--mem-mb 8000 --nthreads 4`                                        | For limited resources        |
+| Generate detailed QC reports  | Default behavior (outputs in `sub-*/figures/` and `reports/`)       | Included                     |
 
 ## Common Shell Command Examples
 
@@ -62,7 +62,6 @@ singularity run --cleanenv \
 ## Installation (Handled by dependency-planner)
 
 Use `dependency-planner` with one of the following requests:
-
 - “Install latest fMRIPrep using Docker”
 - “Install latest fMRIPrep using Singularity”
 - “Install fMRIPrep via conda/mamba in neuroclaw-fmriprep environment”
@@ -133,13 +132,11 @@ if __name__ == "__main__":
 - `dcm2nii` → convert DICOM to NIfTI and organize into BIDS
 - `dependency-planner` → install fMRIPrep and dependencies
 - `claw-shell` → safe execution of long-running pipeline
-- `fsl-tool` / `freesurfer-processor` → post-fMRIPrep analysis
-- `experiment-controller` → manage subsequent modeling on preprocessed data
+- `fsl-tool` / `freesurfer-tool` → post-fMRIPrep analysis
 
 ## More Advanced Features
 
 For advanced options (custom templates, surface-based processing, ICA-AROMA, etc.), please refer to the official fMRIPrep documentation:
-
 - Official Documentation: https://fmriprep.org/
 - User Guide: https://fmriprep.org/en/stable/
 - BIDS App specification: https://bids-apps.neuroimaging.io/
@@ -149,5 +146,5 @@ You may use the `multi-search-engine` or `academic-research-hub` skill to retrie
 ---
 
 Created At: 2026-03-25 17:10 HKT  
-Last Updated At: 2026-03-25 17:10 HKT  
+Last Updated At: 2026-03-25 23:37 HKT  
 Author: Cheng Wang

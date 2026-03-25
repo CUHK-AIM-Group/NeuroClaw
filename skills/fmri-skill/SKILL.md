@@ -26,19 +26,19 @@ It strictly follows the NeuroClaw hierarchical design principles:
 
 ## Quick Reference (Common fMRI Tasks – Updated 2026-03-25)
 
-| Task                                      | What needs to be done                                                      | Delegate to which tool skill                                      | Expected output                          |
-|-------------------------------------------|----------------------------------------------------------------------------|-------------------------------------------------------------------|------------------------------------------|
-| BIDS organization                         | Convert raw DICOM/NIfTI into valid BIDS structure                          | `bids-organizer`                                                  | BIDS-compliant dataset                   |
-| Standardized preprocessing (fMRIPrep)     | Motion correction, distortion correction, coregistration, normalization   | `fmriprep-tool`                                                   | Preprocessed BOLD + anatomical derivatives |
-| High-quality HCP-style preprocessing      | Structural + functional (ICA-FIX) + diffusion + MSMAll surface alignment  | `hcppipeline-tool`                                                | HCP-style preprocessed data              |
-| Atlas alignment to MNI152                 | Register functional/anatomical data to MNI152 template                     | `fmriprep-tool` or `hcppipeline-tool` or `fsl-tool`               | Data in MNI152 space                     |
-| ROI-data extraction                       | Extract mean time series from atlas-defined ROIs                           | `fsl-tool`                                                        | ROI time-series (CSV / .npy)             |
-| Functional connectivity                   | Seed-based correlation, whole-brain functional connectivity, network analysis | `fsl-tool` or `conn-tool`                                         | Correlation matrices, connectivity maps  |
-| Effective connectivity                    | Psychophysiological Interaction (PPI/gPPI), Granger causality, Dynamic Causal Modeling (DCM) | `fsl-tool` or `conn-tool`                                         | PPI maps, causality matrices, DCM parameters |
-| First-level GLM (task-based)              | Task regressors + contrast estimation                                      | `fsl-tool` (FEAT)                                                 | Z-stat maps, cope files                  |
-| Group-level analysis                      | Second-level statistics across subjects                                    | `fsl-tool` (randomise / FEAT)                                     | Group statistical maps                   |
-| Advanced connectivity analysis (CONN)     | ROI-to-ROI, seed-to-voxel, ICA networks, PPI/gPPI, DCM                    | `conn-tool`                                                       | Comprehensive connectivity results       |
-| Full end-to-end pipeline                  | BIDS → preprocessing (fMRIPrep or HCP) → alignment → ROI → connectivity   | `bids-organizer` + `fmriprep-tool` or `hcppipeline-tool` + `fsl-tool` or `conn-tool` | Complete results + QC report             |
+| Task                              | What needs to be done                                      | Delegate to which tool skill                          | Expected output                          |
+|-----------------------------------|------------------------------------------------------------|-------------------------------------------------------|------------------------------------------|
+| BIDS organization                 | Convert raw DICOM/NIfTI into valid BIDS structure          | `bids-organizer`                                      | BIDS-compliant dataset                   |
+| Standardized preprocessing (fMRIPrep) | Motion correction, distortion correction, coregistration, normalization | `fmriprep-tool`                                       | Preprocessed BOLD + anatomical derivatives |
+| High-quality HCP-style preprocessing | Structural + functional (ICA-FIX) + diffusion + MSMAll surface alignment | `hcppipeline-tool`                                   | HCP-style preprocessed data              |
+| Atlas alignment to MNI152         | Register functional/anatomical data to MNI152 template     | `fmriprep-tool` or `hcppipeline-tool` or `fsl-tool`  | Data in MNI152 space                     |
+| ROI-data extraction               | Extract mean time series from atlas-defined ROIs           | `fsl-tool`                                            | ROI time-series (CSV / .npy)             |
+| Functional connectivity           | Seed-based correlation, whole-brain functional connectivity, network analysis | `fsl-tool` or `conn-tool`                            | Correlation matrices, connectivity maps  |
+| Effective connectivity            | Psychophysiological Interaction (PPI/gPPI), Granger causality, Dynamic Causal Modeling (DCM) | `fsl-tool` or `conn-tool`                            | PPI maps, causality matrices, DCM parameters |
+| First-level GLM (task-based)      | Task regressors + contrast estimation                      | `fsl-tool` (FEAT)                                     | Z-stat maps, cope files                  |
+| Group-level analysis              | Second-level statistics across subjects                    | `fsl-tool` (randomise / FEAT)                         | Group statistical maps                   |
+| Advanced connectivity analysis (CONN) | ROI-to-ROI, seed-to-voxel, ICA networks, PPI/gPPI, DCM   | `conn-tool`                                           | Comprehensive connectivity results       |
+| Full end-to-end pipeline          | BIDS → preprocessing (fMRIPrep or HCP) → alignment → ROI → connectivity | `bids-organizer` + `fmriprep-tool` or `hcppipeline-tool` + `fsl-tool` or `conn-tool` | Complete results + QC report             |
 
 ## Installation (Handled by dependency-planner)
 
@@ -75,13 +75,13 @@ All execution is routed through `bids-organizer`, `fmriprep-tool`, `hcppipeline-
 - `fsl-tool` → ROI extraction, basic connectivity, PPI, FEAT GLM
 - `dependency-planner` → environment management
 - `claw-shell` → safe execution of long-running pipelines
-- `paper-writing` → generate tables and figures from connectivity matrices and statistical maps
 
 ## Reference & Source
 
-Aligned with NeuroClaw modality-skill pattern (see `eeg-skill`, `freesurfer-processor`, etc.).  
+Aligned with NeuroClaw modality-skill pattern (see `eeg-skill`, `wmh-segmentation`, etc.).  
 Core tools used: `fmriprep-tool` (standard preprocessing), `hcppipeline-tool` (HCP-style high-quality processing), `conn-tool` (advanced connectivity), `fsl-tool` (connectivity + ROI + GLM), `bids-organizer` (data structuring).
 
+---
 Created At: 2026-03-25 16:02 HKT  
-Last Updated At: 2026-03-25 16:10 HKT  
+Last Updated At: 2026-03-25 23:15 HKT  
 Author: Cheng Wang
