@@ -204,7 +204,7 @@ Subagent in NeuroClaw includes four categories: **tool**, **model**, **dataset**
 
 ---
 
-## TODO
+## TODO List
 
 ### Architecture & Foundation
 - ✓ Hierarchical architecture design (Interface-Subagent-Base Tool)
