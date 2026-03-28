@@ -32,42 +32,119 @@ It strictly follows NeuroClaw hierarchical design principles:
 | DICOM → NIfTI | Convert DICOM series to NIfTI (+ JSON) | `dcm2nii` | `*_T1w.nii.gz`, `*_T2w.nii.gz`, `*_FLAIR.nii.gz`, `*.json` |
 | Organize to BIDS | Create valid BIDS layout (anat/) | `bids-organizer` | `bids/sub-*/anat/sub-*_T1w.nii.gz` etc. |
 | Fast structural preprocessing | Brain extraction, bias correction, tissue segmentation, MNI registration | `fsl-tool` (`fsl_anat`, BET/FAST/FLIRT/FNIRT) | brain mask, tissue maps, transforms, QC |
-| Surface-based morphometry | Cortical surfaces, parcellation, thickness, aseg/aparc stats | `freesurfer-tool` | FreeSurfer subject dir, stats tables |
+| FreeSurfer Autorecon1 (volumetric preprocessing) | Image conversion, motion correction, intensity normalization, registration to Talairach, bias correction, skull stripping | `freesurfer-tool` (`recon-all -autorecon1`) | `orig.mgz`, `T1.mgz`, `brainmask.mgz`, `transforms/talairach.xfm` |
+| FreeSurfer Autorecon2 (subcortical segmentation & surface extraction) | Tissue classification, white matter segmentation, surface tessellation, topology repair, white matter & pial surface generation | `freesurfer-tool` (`recon-all -autorecon2`) | `?h.orig`, `?h.white`, `?h.pial`, `aseg.mgz`, `wm.mgz`, surface QC |
+| FreeSurfer Autorecon3 (spherical registration & parcellation) | Spherical surface registration, cortical parcellation (Desikan-Killiany, Destrieux, DKT), anatomical statistics extraction, Brodmann area mapping | `freesurfer-tool` (`recon-all -autorecon3`) | `?h.sphere.reg`, `?h.aparc.annot`, `stats/?h.aparc.stats`, ROI morphology tables |
+| Full FreeSurfer pipeline (all 3 stages) | Complete T1/T2 preprocessing with optional T2-pial refinement | `freesurfer-tool` (`recon-all -all -T2pial`) | Full FreeSurfer subject directory with surfaces, atlases, stats |
+| Surface-based morphometry (quick) | Cortical surfaces, parcellation, thickness, aseg/aparc stats (simplified) | `freesurfer-tool` | FreeSurfer subject dir, stats tables |
 | HCP-grade structural pipeline | PreFreeSurfer → FreeSurfer → PostFreeSurfer | `hcppipeline-tool` | HCP-style derivatives, surfaces, QC |
 | BIDS anatomical derivatives (standardized) | Run BIDS-App anatomical-only workflow | `fmriprep-tool` (`--anat-only`) | BIDS derivatives + QC report |
 | WMH lesion segmentation | Segment WMH from FLAIR+T1 | `wmh-segmentation` (+ `docker-env-manager` if Docker ops needed) | WMH mask NIfTI + run log |
-| ROI-wise feature extraction | Extract ROI stats from derived maps (GM prob, WMH mask, thickness maps in NIfTI, etc.) | `nilearn-tool` (or `fsl-tool` `fslstats`) | `roi_stats_*.csv` |
+| ROI-wise feature extraction | Extract ROI stats from derived maps (GM prob, WMH mask, thickness maps in NIfTI, cortical thickness, surface-based stats) | `nilearn-tool` (or `fsl-tool` `fslstats`, FreeSurfer `mris_anatomical_stats`) | `roi_stats_*.csv`, morphology tables |
 | Export results to DICOM | Convert final NIfTI outputs back to DICOM series | `nii2dcm` | DICOM series for PACS/viewers |
 
 ---
 
 ## Recommended Strategy (Decision Logic)
-- If the goal is **quick brain extraction + tissue segmentation + MNI alignment** (fast baseline):
+- If the goal is **quick brain extraction + tissue segmentation + MNI alignment** (fast baseline, ~6 minutes):
   - Prefer `fsl-tool` (`fsl_anat`).
-- If the goal is **cortical thickness / surface parcellation / aseg-aparc volumetry**:
-  - Prefer `freesurfer-tool` (`recon-all`).
+  - Best for: quick QC, preprocessing, multi-subject batches.
+
+- If the goal is **cortical thickness / surface parcellation / aseg-aparc volumetry** (detailed surface morphometry):
+  - Prefer `freesurfer-tool` (`recon-all`) with **3-stage execution** (recommended for flexibility):
+    - **Stage 1: `-autorecon1`** (volumetric preprocessing, ~15-30 min)
+      - Produces: intensity-normalized brain image (`T1.mgz`), Talairach registration (`talairach.xfm`), brain mask (`brainmask.mgz`).
+      - Use when: you need just preprocessing, quality control, or pial surface refinement before running surface extraction.
+    - **Stage 2: `-autorecon2`** (white matter segmentation & surface extraction, ~30-60 min)
+      - Produces: white matter mask (`wm.mgz`), initial surfaces (`?h.orig`, `?h.white`, `?h.pial`), segmentation (`aseg.mgz`).
+      - Use when: you need cortical surfaces for thickness measurement, but haven't registered to standard space yet.
+    - **Stage 3: `-autorecon3`** (spherical registration & parcellation, ~15-30 min)
+      - Produces: registered sphere (`?h.sphere.reg`), cortical parcellations (`?h.aparc.annot`, `?h.aparc.a2009s.annot`, `?h.aparc.DKTatlas.annot`), morphometric statistics (`stats/?h.aparc.stats`).
+      - Use when: you need full atlas-based ROI labels, cortical thickness maps, and anatomical statistics for group-level analysis.
+  - **Quick execution**: Run `recon-all -all -T2pial` (if T2 available, ~2-3 hours total) for immediate full results.
+  - Best for: surface-based group analysis, cortical thickness studies, clinico-anatomical correlation.
+
 - If the goal is **highest-quality, HCP-style surfaces and multimodal alignment**:
   - Prefer `hcppipeline-tool` (structural stages).
+  - Best for: HCP datasets, publication-grade preprocessing, maximal anatomical detail.
+
 - If the dataset is already **BIDS** and you want **standardized derivatives + QC** (and future fMRI integration):
   - Prefer `fmriprep-tool --anat-only` (or full fMRIPrep if fMRI exists).
+  - Best for: reproducible BIDS-compliant preprocessing, multi-modal (fMRI-ready), open science.
+
 - If the goal is **WMH lesion segmentation** (vascular burden, aging, MS-like WM lesions):
   - Use `wmh-segmentation` (Docker-based); ensure Docker readiness via `docker-env-manager` if needed.
-- If the goal is **ROI-level tables** from any NIfTI scalar map:
+  - Best for: FLAIR+T1 pathological lesion mapping.
+
+- If the goal is **ROI-level tables** from any NIfTI scalar map (thickness, volume, WMH count, etc.):
   - Use `nilearn-tool` to generate reproducible CSV feature tables.
+  - Best for: downstream statistical analysis, machine learning pipelines.
+
+---
+
+## FreeSurfer Setup & Prerequisites (Ubuntu)
+
+### System Dependencies & Installation
+For Ubuntu 22.04+ systems, `freesurfer-tool` must ensure:
+
+#### 1. System-level Dependencies
+```bash
+sudo apt-get update
+sudo apt-get install -y \
+  tcsh bc perl tar libgomp1 build-essential \
+  wget vim-common libxmu-dev libxi-dev libxt-dev \
+  libx11-dev libglu1-mesa-dev libjpeg62-dev
+```
+
+#### 2. FreeSurfer Installation & License
+- **Download** FreeSurfer 7.4.1 (or newer): Install to `/usr/local/freesurfer/`
+- **License file**: Obtain from https://surfer.nmr.mgh.harvard.edu/fswiki/License → place at `/usr/local/freesurfer/license.txt`
+
+#### 3. Environment Configuration (in shell profile, e.g., `.bashrc`)
+```bash
+export FREESURFER_HOME=/usr/local/freesurfer
+export SUBJECTS_DIR=/path/to/your/freesurfer/subjects
+source $FREESURFER_HOME/SetUpFreeSurfer.sh
+```
+
+### When to Use Each Stage
+
+| Stage | Command | Input | Output | Runtime | Use Case |
+|---|---|---|---|---|---|
+| **Autorecon1** | `recon-all -autorecon1 -i <T1.nii.gz> -subjid <sub>` | T1w NIfTI (mandatory) | `orig.mgz`, `T1.mgz`, `brainmask.mgz`, Talairach xfm | 15–30 min | Preprocessing only, QC checkpoints, T2-pial setup |
+| **Autorecon2** | `recon-all -autorecon2 -subjid <sub>` | (uses autorecon1 outputs) | `wm.mgz`, surfaces (`?h.orig`, `?h.white`, `?h.pial`) | 30–60 min | Cortical surface extraction, thickness measurement |
+| **Autorecon3** | `recon-all -autorecon3 -subjid <sub>` | (uses autorecon2 outputs) | `?h.sphere.reg`, `?h.aparc.annot`, stats tables | 15–30 min | Atlas registration, ROI labels, group analysis ready |
+| **All (1-click)** | `recon-all -all -T2pial -i <T1.nii.gz> -T2 <T2.nii.gz> -subjid <sub>` | T1w (required), T2w (optional but improves pial surface) | Complete subject dir | 2–3 hours | Full pipeline; T2-pial refines pial boundary |
 
 ---
 
 ## Standard Output Layout (Recommended)
 All outputs must be written under `./smri_output/`:
-- `smri_output/nifti/`        (converted inputs if needed)
-- `smri_output/bids/`         (optional staging BIDS)
-- `smri_output/fsl_anat/`     (FSL structural outputs)
-- `smri_output/freesurfer/`   (FreeSurfer SUBJECTS_DIR or symlink)
+- `smri_output/nifti/`        (converted inputs if needed: `*_T1w.nii.gz`, `*_T2w.nii.gz`)
+- `smri_output/bids/`         (optional staging BIDS: `bids/sub-*/anat/`)
+- `smri_output/fsl_anat/`     (FSL structural outputs: brain mask, tissue maps, transforms)
+- `smri_output/freesurfer/`   (FreeSurfer SUBJECTS_DIR structure)
+  - `freesurfer/sub-01/mri/`
+    - `orig.mgz`, `T1.mgz`, `T2.mgz` (if T2 available)
+    - `brainmask.mgz`, `wm.mgz`, `norm.mgz`
+    - `aseg.mgz`, `aparc+aseg.mgz`, `wmparc.mgz` (after autorecon2+3)
+    - `transforms/talairach.xfm`, `cc_up.lta`, etc.
+  - `freesurfer/sub-01/surf/`
+    - `?h.orig`, `?h.white`, `?h.pial` (surfaces)
+    - `?h.sphere.reg` (registered sphere, after autorecon3)
+    - `?h.inflated`, `?h.sphere` (topological surfaces)
+  - `freesurfer/sub-01/label/`
+    - `?h.aparc.annot`, `?h.aparc.a2009s.annot`, `?h.aparc.DKTatlas.annot` (parcellations, after autorecon3)
+    - `?h.cortex.label`, `?h.BA*.label` (Brodmann areas, after autorecon3)
+  - `freesurfer/sub-01/stats/`
+    - `?h.aparc.stats`, `?h.aparc.a2009s.stats`, `?h.aparc.DKTatlas.stats` (cortical morphometry)
+    - `aseg.stats`, `wmparc.stats` (subcortical volumes)
+    - `?h.curv.stats` (curvature statistics)
 - `smri_output/hcp/`          (HCP structural outputs)
 - `smri_output/fmriprep/`     (fMRIPrep derivatives/QC pointers)
 - `smri_output/wmh/`          (WMH masks + logs)
-- `smri_output/roi/`          (ROI feature CSVs)
-- `smri_output/logs/`         (claw-shell log tags / pointers)
+- `smri_output/roi/`          (ROI feature CSVs extracted from FreeSurfer stats or NIfTI-based ROIs)
+- `smri_output/logs/`         (claw-shell log tags / pointers, FreeSurfer recon-all logs)
 
 ---
 
@@ -80,10 +157,17 @@ All outputs must be written under `./smri_output/`:
 ---
 
 ## Important Notes & Limitations
-- Structural pipelines can be long-running (especially FreeSurfer/HCP). Always provide runtime + disk estimates in the plan.
-- FreeSurfer requires a valid license; fMRIPrep/HCP may require it depending on configuration.
-- ROI extraction requires atlas alignment (same space/grid as the target map). Registration is handled by `fsl-tool`, `fmriprep-tool`, or `hcppipeline-tool`.
-- This skill is for research workflows; not for clinical decision-making.
+- **Structural pipelines are long-running** (especially FreeSurfer/HCP). Always provide realistic runtime + disk estimates in the plan:
+  - Autorecon1: 15–30 min, ~2 GB disk
+  - Autorecon2: 30–60 min, ~1 GB additional
+  - Autorecon3: 15–30 min, ~500 MB additional
+  - Full pipeline (`-all`): 2–3 hours total, ~4–5 GB disk per subject
+- **FreeSurfer License**: Required and must be placed at `$FREESURFER_HOME/license.txt`. Obtain from https://surfer.nmr.mgh.harvard.edu/fswiki/License (free registration).
+- **T2-pial optimization**: Include T2w image with `-T2 <file> -T2pial` flags to refine pial surface in cortical regions with ambiguous GM/CSF boundaries. Recommended for HCP and high-resolution clinical datasets.
+- **System dependencies**: Unix/Linux-only (macOS with Rosetta2 for ARM; Windows via WSL2). Requires X11 forwarding for visualization tools.
+- **ROI extraction**: Surface-based ROIs from FreeSurfer `.annot` files can be extracted via `mris_anatomical_stats` (built-in) or converted to NIfTI via `mri_aparc2aseg` for volumetric ROI analysis.
+- **Registration outputs**: FreeSurfer surfaces (`?h.sphere.reg`) are registered to average template space; enables cross-subject statistical inference via QDEC or nilearn.
+- **This skill is for research workflows**; not for clinical decision-making.
 
 ---
 
@@ -108,9 +192,9 @@ All outputs must be written under `./smri_output/`:
 ---
 
 ## Reference & Source
-Aligned with NeuroClaw modality-skill pattern (see `fmri-skill`, `dwi-skill`, `eeg-skill`).
+Aligned with NeuroClaw modality-skill pattern (see `fmri-skill`, `dti-skill`, `eeg-skill`).
 Common sMRI toolchain: FSL (fast structural utilities), FreeSurfer (surface morphometry), HCP pipelines (HCP-grade structural processing), fMRIPrep (BIDS anatomical derivatives), Nilearn (ROI features on NIfTI maps), MARS-WMH (WMH segmentation via Docker).
 
 Created At: 2026-03-26 1:09 HKT
-Last Updated At: 2026-03-26 1:09 HKT
+Last Updated At: 2026-03-28 17:43 HKT
 Author: chengwang96

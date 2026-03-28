@@ -103,7 +103,7 @@ NeuroClaw/
 │   ├── dependency-planner/
 │   ├── dipy-tool/
 │   ├── docker-env-manager/
-│   ├── dwi-skill/
+│   ├── dti-skill/
 │   ├── eeg-skill/
 │   ├── experiment-controller/
 │   ├── fmri-skill/
@@ -162,6 +162,7 @@ NeuroClaw/
 | `method-design` | Formalizes network architecture and derives theoretical components | ✅ |
 | `experiment-controller` | Finds and executes reproducible research experiments | ✅ |
 | `paper-writing` | Generates hierarchical manuscript drafts from IDEA/METHOD/EXPERIMENT | ✅ |
+| `run_models` | Model registry and model execution orchestration | ✅ |
 
 ### Subagent Layer
 Subagent in NeuroClaw includes four categories: **tool**, **model**, **dataset**, and **modality**.
@@ -183,12 +184,14 @@ Subagent in NeuroClaw includes four categories: **tool**, **model**, **dataset**
 | Skill | Function | Status |
 |------|----------|--------|
 | `wmh-segmentation` | White matter hyperintensity segmentation (MARS-WMH nnU-Net) | ✅ |
+| `brain_gnn` | BrainGNN: graph neural network for fMRI classification | ✅ |
+| `fm_app` | FM-APP: multi-stage phenotype prediction with fMRI+sMRI | ✅ |
 
 #### Dataset
 | Skill | Function | Status |
 |------|----------|--------|
-| `adni-skill` | ADNI dataset automated processing workflow | ⏳ |
-| `hcp-skill` | HCP-YA dataset automated processing workflow | ⏳ |
+| `adni-skill` | ADNI dataset automated processing workflow | ✅ |
+| `hcp-skill` | HCP-YA dataset automated processing workflow | ✅ |
 | `ukb-skill` | UKB brain imaging automated processing workflow | ⏳ |
 
 #### Modality
@@ -196,8 +199,8 @@ Subagent in NeuroClaw includes four categories: **tool**, **model**, **dataset**
 |------|----------|--------|
 | `eeg-skill` | EEG preprocessing and feature extraction workflows | ✅ |
 | `fmri-skill` | Functional MRI preprocessing and analysis workflows | ✅ |
-| `smri-skill` | Structural MRI preprocessing and analysis workflows | 🏗️ |
-| `dwi-skill` | Diffusion MRI preprocessing and analysis workflows | 🏗️ |
+| `smri-skill` | Structural MRI preprocessing and analysis workflows | ✅ |
+| `dti-skill` | Diffusion MRI preprocessing and analysis workflows | ✅ |
 
 **Legend**: ✅ Implemented | 🏗️ In Development | ⏳ Planned
 
@@ -208,27 +211,25 @@ Subagent in NeuroClaw includes four categories: **tool**, **model**, **dataset**
 
 ### Architecture & Foundation
 - ✓ Hierarchical architecture design (Interface-Subagent-Base Tool)
-- ☐ Complete Interface layer implementation
-- ☐ Subagent coordination mechanisms
+- ✓ Complete Interface layer implementation
+- ✓ Subagent coordination mechanisms
 - ☐ Enhanced task orchestration
 
 ### Dataset Ecosystem
 - ☐ Complete ADNI processing chain
+- ✓ HCP dataset adaptation
 - ☐ UK Biobank adaptation
-- ☐ Public dataset navigation and discovery
 - ☐ Multi-dataset workflow support
 
 ### Model Reproduction & Execution
-- ☐ Automatic paper model retrieval
-- ☐ Automatic environment configuration
+- ✓ Automatic paper model retrieval
+- ✓ Automatic environment configuration
 - ☐ Reproducibility verification
 - ☐ Model versioning and tracking
 
 ### Community & Extensions
-- ☐ Community-contributed skill marketplace
 - ☐ Multi-institution collaboration capabilities
 - ☐ Plugin ecosystem for third-party skills
-- ☐ Domain-specific extensions
 
 ---
 
