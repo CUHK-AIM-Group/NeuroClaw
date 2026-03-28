@@ -49,8 +49,6 @@ If any part is ambiguous, it asks the user for clarification before proceeding.
 - `research-idea` → provides IDEA.md (input)
 - `experiment-controller` → consumes METHOD.md
 - `paper-writing` → consumes METHOD.md
-- `claw-shell` / `dependency-planner` → used internally for formula verification or dependency checks
-- `overleaf-skill` → optional for LaTeX equation rendering in final draft
 
 ## Reference & Source
 NeuroClaw architecture (section 1.5 method-design skill).  

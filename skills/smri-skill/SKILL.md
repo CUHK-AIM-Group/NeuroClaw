@@ -94,7 +94,6 @@ All outputs must be written under `./smri_output/`:
 
 ## Complementary / Related Skills
 - `dcm2nii` → DICOM → NIfTI
-- `bids-organizer` → build/validate BIDS structure
 - `fsl-tool` → fsl_anat / BET / FAST / FIRST / registration utilities
 - `freesurfer-tool` → cortical & subcortical morphometry + thickness/parcellation
 - `hcppipeline-tool` → HCP-style structural pipeline

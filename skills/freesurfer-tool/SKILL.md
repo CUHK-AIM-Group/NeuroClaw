@@ -188,11 +188,9 @@ if __name__ == "__main__":
 
 ## Complementary / Related Skills
 
-- `dcm2nii` → convert DICOM to NIfTI input  
 - `dependency-planner` → install FreeSurfer + license  
 - `claw-shell` → safe execution of long-running shell commands  
 - `conda-env-manager` → manage Python environment for post-processing FreeSurfer outputs  
-- `fmriprep-tool` → can feed preprocessed data into FreeSurfer (via `--fs-subjects-dir`)
 
 ## Reference & Source
 

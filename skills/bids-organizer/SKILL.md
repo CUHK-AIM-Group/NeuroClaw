@@ -102,7 +102,6 @@ def organize_to_bids(raw_dir, bids_dir, subject_id, session_id="01"):
 
 ## Complementary / Related Skills
 
-- `dcm2nii` → DICOM to NIfTI conversion
 - `dependency-planner` → install required tools
 - `claw-shell` → safe execution of all commands
 

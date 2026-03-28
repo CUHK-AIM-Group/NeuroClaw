@@ -112,7 +112,6 @@ if __name__ == "__main__":
 - `bids-organizer` → organize raw data into BIDS before running HCP
 - `fmriprep-tool` → lighter and faster alternative to HCP preprocessing
 - `fsl-tool` → post-HCP connectivity and ROI analysis
-- `fmri-skill` → high-level modality layer that can delegate to this tool
 - `dependency-planner` → install HCP Pipelines and dependencies
 - `claw-shell` → safe execution of long-running pipelines
 - `multi-search-engine` / `academic-research-hub` → retrieve latest HCP best practices

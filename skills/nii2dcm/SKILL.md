@@ -124,10 +124,8 @@ python nii2dcm_wrapper.py \
 - Preparing outputs for PACS import, clinical collaboration, or archiving
 
 ## Complementary / Related Skills
-- `dcm2nii`               → reverse: DICOM → NIfTI
 - `dependency-planner`    → install dependencies
 - `claw-shell`            → safe execution of conversion commands
-- `bids-organizer`        → prepare inputs when working with structured datasets
 
 ## Reference & Source
 

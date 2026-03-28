@@ -119,7 +119,6 @@ echo "WMH segmentation mask saved in $OUTPUT_DIR"
 - `dcm2nii`              → convert DICOM to NIfTI input
 - `dependency-planner`   → install Docker and NVIDIA Container Toolkit
 - `claw-shell`           → safe Docker execution
-- `fmriprep-tool` / `fsl-tool` → related preprocessing pipelines
 
 ## Reference & Source
 Official repo: https://github.com/miac-research/MARS-WMH  

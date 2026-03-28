@@ -260,7 +260,6 @@ if __name__ == "__main__":
 ## Complementary / Related Skills
 - `claw-shell` → executes this skill’s wrapper
 - `dependency-planner` + `conda-env-manager` → creates `neuroclaw-eeg` environment
-- `eeg-skill` → modality-layer interface that calls this tool skill
 
 ## Reference & Source
 Official MNE-Python documentation (https://mne.tools) + MNE-Connectivity + mne-microstates.  

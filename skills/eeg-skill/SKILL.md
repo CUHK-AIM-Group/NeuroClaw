@@ -98,9 +98,7 @@ def extract_band_power(signal, fs=256):
 ## Complementary / Related Skills
 
 - `dependency-planner` + `conda-env-manager` → environment and package installation (MNE-Python + torchaudio + scipy)
-- `claw-shell` → all actual execution
 - `mne-eeg-tool` → base/tool layer that contains all specific implementation code
-- `dcm2nii` → convert clinical EEG DICOM series to NIfTI/EDF when raw data arrives in DICOM format
 
 ## Reference & Source
 

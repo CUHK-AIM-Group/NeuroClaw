@@ -74,7 +74,6 @@ All execution is routed through `bids-organizer`, `fmriprep-tool`, `hcppipeline-
 - `conn-tool` → advanced functional & effective connectivity (ROI-to-ROI, seed-to-voxel, PPI/gPPI, DCM)
 - `fsl-tool` → ROI extraction, basic connectivity, PPI, FEAT GLM
 - `dependency-planner` → environment management
-- `claw-shell` → safe execution of long-running pipelines
 
 ## Reference & Source
 

@@ -433,9 +433,7 @@ git commit   # Or git merge --continue
 
 ## Complementary / Related Skills
 - `git-workflows` → advanced operations (rebase, bisect, worktree, sparse checkout, etc.)
-- `dependency-planner` → often uses Git to clone repositories
 - `claw-shell` → all Git commands are safely executed through claw-shell
-- `experiment-controller` → clones and manages experiment repositories
 
 ## Reference & Source
 Official docs: https://git-scm.com/doc  

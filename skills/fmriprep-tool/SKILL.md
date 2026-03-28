@@ -129,10 +129,8 @@ if __name__ == "__main__":
 
 ## Complementary / Related Skills
 
-- `dcm2nii` → convert DICOM to NIfTI and organize into BIDS
 - `dependency-planner` → install fMRIPrep and dependencies
 - `claw-shell` → safe execution of long-running pipeline
-- `fsl-tool` / `freesurfer-tool` → post-fMRIPrep analysis
 
 ## More Advanced Features
 

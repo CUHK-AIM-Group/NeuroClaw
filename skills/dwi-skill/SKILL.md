@@ -79,15 +79,13 @@ All outputs must be written under `./dwi_output/`:
 ---
 
 ## Complementary / Related Skills
-- **`qsiprep-tool`** → recommended BIDS-App diffusion preprocessing + QC reports
+- `qsiprep-tool` → recommended BIDS-App diffusion preprocessing + QC reports
 - `dipy-tool` → tensor metrics (FA/MD/AD/RD) + diffusion scalar map handling
 - `nilearn-tool` → ROI/atlas feature extraction from diffusion scalar maps (NIfTI)
 - `fsl-tool` → topup/eddy, dtifit, bedpostx/probtrackx, diffusion utilities
 - `hcppipeline-tool` → HCP diffusion preprocessing alternative
 - `bids-organizer` → create/validate BIDS dataset
-- `dcm2nii` → DICOM to NIfTI conversion
 - `dependency-planner` + `conda-env-manager` → installation/environment management
-- `claw-shell` → mandatory safe execution layer
 - `docker-env-manager` → used when QSIPrep runs via Docker and container ops need planning
 
 ---

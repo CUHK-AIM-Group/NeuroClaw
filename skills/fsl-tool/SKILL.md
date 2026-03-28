@@ -129,12 +129,8 @@ echo $FSLDIR
 
 ## Complementary / Related Skills
 
-- `dcm2nii` / `nii2dcm`  
 - `dependency-planner`  
 - `claw-shell`  
-- `freesurfer-tool`  
-- `wmh-segmentation`  
-- `fmriprep-tool`
 
 ## More Advanced Features
 

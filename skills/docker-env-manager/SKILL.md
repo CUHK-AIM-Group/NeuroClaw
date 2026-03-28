@@ -131,7 +131,6 @@ if __name__ == "__main__":
 - `claw-shell` → **mandatory** safe execution of all Docker commands (tmux `claw` session)
 - `dependency-planner` → install Docker Engine + NVIDIA Container Toolkit
 - `multi-search-engine` → lookup latest Docker Hub / GitHub Container Registry instructions
-- `git-essentials` / `git-workflows` → clone repositories containing Dockerfiles
 
 ## Reference & Source
 

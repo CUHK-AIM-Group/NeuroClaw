@@ -244,9 +244,7 @@ conda run -n neuroclaw-dipy python skills/dipy-tool/dipy_pipeline.py \
 ---
 
 ## Complementary / Related Skills
-- `dcm2nii` → DICOM → NIfTI conversion (often produces bval/bvec)
 - `dependency-planner` + `conda-env-manager` → install/manage `neuroclaw-dipy`
-- `claw-shell` → **mandatory** safe execution layer
 
 ---
 

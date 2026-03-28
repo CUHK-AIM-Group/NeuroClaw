@@ -117,8 +117,6 @@ if __name__ == "__main__":
 ## Complementary / Related Skills
 
 - `dependency-planner` → delegates installation and environment variable commands here
-- `git-essentials` / `git-workflows` → git operations routed here
-- `conda-env-manager` → conda commands routed here
 
 ## Reference & Source
 

@@ -159,7 +159,6 @@ python dcm2nii_wrapper.py \
 
 ## Complementary / Related Skills
 
-- `nii2dcm`                  → reverse: NIfTI back to DICOM
 - `dependency-planner`       → install dependencies
 
 ## Reference & Source

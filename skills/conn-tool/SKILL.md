@@ -97,11 +97,7 @@ if __name__ == "__main__":
 
 ## Complementary / Related Skills
 
-- `fmriprep-tool` → standard preprocessing
-- `hcppipeline-tool` → high-quality HCP-style preprocessing
-- `fsl-tool` → basic connectivity and PPI as lighter alternative
 - `dependency-planner` → install CONN + SPM + MATLAB environment
-- `claw-shell` → safe execution of MATLAB/CONN commands
 
 ## Reference & Source
 

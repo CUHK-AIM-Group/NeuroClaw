@@ -121,7 +121,6 @@ if __name__ == "__main__":
 
 - `dependency-planner` → package installation after environment creation
 - `multi-search-engine` → lookup latest conda channel / solver advice
-- `git-essentials` / `git-workflows` → commit environment.yml
 - `claw-shell` → execution of conda commands
 
 ## Reference & Source

@@ -107,9 +107,6 @@ conda install -n neuroclaw-nilearn -c conda-forge nilearn nibabel numpy scipy pa
 ---
 
 ## Complementary / Related Skills
-- `fmri-skill` → modality-layer delegator
-- `fmriprep-tool` → recommended preprocessing + confounds TSV
-- `fsl-tool` → registration, alternative stats utilities
 - `dependency-planner` + `conda-env-manager` → install/manage `neuroclaw-nilearn`
 - `claw-shell` → mandatory execution layer
 

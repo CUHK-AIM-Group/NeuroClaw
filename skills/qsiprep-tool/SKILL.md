@@ -219,11 +219,6 @@ if __name__ == "__main__":
 ---
 
 ## Complementary / Related Skills
-- `bids-organizer` → make dataset BIDS-compliant
-- `dcm2nii` → DICOM → NIfTI (with bval/bvec export)
-- `fsl-tool` → alternative / additional diffusion preprocessing and registration
-- `hcppipeline-tool` → HCP-style diffusion preprocessing alternative
-- `dipy-tool` → post-QSIPrep tensor metrics + ROI feature extraction in Python
 - `dependency-planner` → install Docker/Apptainer + QSIPrep image
 - `docker-env-manager` → safe Docker operations (pull/run/prune) when needed
 - `claw-shell` → mandatory safe execution layer
