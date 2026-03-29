@@ -1,6 +1,6 @@
 <div align="center">
 
-# NeuroClaw: End-to-End Intelligent System for Neuroscience Research
+# NeuroClaw: Data-and-Model Centric Platform for Neuroscience Research
 
 <div align="center">
 
@@ -13,24 +13,26 @@
 
 ## 📖 Overview
 
-**NeuroClaw** is an intelligent system for neuroscience research built upon the [OpenClaw](https://github.com/openclaw/openclaw) framework. It integrates a complete research workflow spanning literature review, experimental design, data processing, model execution, and result visualization. By combining intelligent agents with a hierarchical skill architecture, NeuroClaw aims to automate and accelerate neuroscience research.
+**NeuroClaw** is a neuroscience-first platform built on the [OpenClaw](https://github.com/openclaw/openclaw) framework. Its core strength is **neuroimaging dataset and model adaptation**: turning raw scans into usable inputs quickly, and enabling medical practitioners to run deep learning models with minimal setup.
 
-NeuroClaw emphasizes **executability** and **dataset-driven** architecture design. Every skill has real production value, dependencies are automatically resolved, and skills can work together organically.
+Neuroimaging datasets demand specialized preprocessing, and preprocessing quality directly determines model validity. Many workflows assume curated datasets, while MedicalClaw provides limited automation for open-source model execution (primarily large projects like TimesFM and AlphaFold), leaving users to spend significant time on environment configuration.
+
+NeuroClaw prioritizes **data processing** and **model configuration/execution**. It remains an end-to-end Claw system, but for neuroscience its center of gravity is data and models.
 
 ---
 
 ## ✨ Key Features
 
-### 🧠 Complete Research Workflow Coverage
+### 🧠 End-to-End Research Coverage
 - **Literature Review**: arXiv search, PubMed retrieval, academic resource integration
 - **Experiment Design**: Scientific literature analysis, methodology evaluation, research proposal generation
-- **Data Processing**: Multi-format conversion support (DICOM ↔ NIfTI), automated preprocessing pipelines
+- **Data Processing**: Multi-format conversion (DICOM ↔ NIfTI), automated preprocessing pipelines
 - **Model Execution**: Run published research models, deep learning framework integration
 - **Result Visualization**: Scientific data visualization, statistical chart generation
 - **Paper Writing**: Auto-generated drafts, format standardization
 
-### 🔄 Dataset-Driven Architecture
-Prioritize organizing capabilities around "processing which dataset" rather than "calling which tool":
+### 🔄 Dataset-First Architecture
+Organize capabilities around "which dataset to process" instead of "which tool to call":
 - **ADNI Dataset** → Integrated ADNI standardized processing pipeline
 - **UK Biobank** → Environment-aware deployment adaptation
 - **Other Public Datasets** → Quick-start tool chains
@@ -38,9 +40,9 @@ Prioritize organizing capabilities around "processing which dataset" rather than
 Users simply specify the target dataset, and the system automatically recommends and orchestrates relevant skills.
 
 ### 🎯 Executability and Reproducibility
-- **Automatic Dependency Management**: No manual installation needed; system automatically detects and resolves dependencies
-- **True Model Execution**: Not just sharing SKILL.md docs, but guiding and executing model reproduction
-- **Environment Isolation**: Virtual environment and containerization support to avoid system pollution
+- **Automatic Dependency Management**: No manual installation needed; the system detects and resolves dependencies
+- **True Model Execution**: Beyond sharing docs, it guides and executes model reproduction
+- **Environment Isolation**: Virtual environments and containerization avoid system pollution
 - **Verifiable Processes**: Complete logging and result tracking
 
 ### 🤝 OpenClaw Compatibility
@@ -94,6 +96,7 @@ NeuroClaw/
 ├── USER.md                         # User-defined configurations and preferences
 ├── SOUL.md                         # System behavior guidelines and principles
 ├── skills/                         # Flat skill directory (logical grouping in docs)
+│   ├── adni-skill/
 │   ├── academic-research-hub/
 │   ├── bids-organizer/
 │   ├── claw-shell/
@@ -112,6 +115,7 @@ NeuroClaw/
 │   ├── fsl-tool/
 │   ├── git-essentials/
 │   ├── git-workflows/
+│   ├── hcp-skill/
 │   ├── hcppipeline-tool/
 │   ├── method-design/
 │   ├── mne-eeg-tool/
@@ -122,13 +126,12 @@ NeuroClaw/
 │   ├── paper-writing/
 │   ├── qsiprep-tool/
 │   ├── research-idea/
+│   ├── run_models/
 │   ├── smri-skill/
 │   └── wmh-segmentation/
 │
 ├── materials/                      # Research materials and reference resources
-│   ├── datasets/                   # Public dataset descriptions and processing guides
-│   ├── models/                     # Paper models and reproduction guides
-│   └── documentation/              # Detailed technical documentation
+│   └── CVPR_2026/
 │
 └── LICENSE                         # License
 
