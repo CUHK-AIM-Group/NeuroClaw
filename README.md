@@ -4,7 +4,7 @@
 
 <div align="center">
 
-[Features](#key-features) • [Quick Start](#quick-start) • [Project Structure](#project-structure) • [Skills](#skill-quick-reference) • [Acknowledgments](#acknowledgments)
+[Features](#-key-features) • [Quick Start](#-quick-start) • [Project Structure](#-project-structure) • [Skills](#%EF%B8%8F-skill-quick-reference) • [Acknowledgments](#-acknowledgments)
 
 </div>
 
@@ -19,8 +19,10 @@ Neuroimaging datasets demand specialized preprocessing, and preprocessing qualit
 
 NeuroClaw prioritizes **data processing** and **model configuration/execution**. It remains an end-to-end Claw system, but for neuroscience its center of gravity is data and models.
 
----
 
+![NeuroClaw Overview](materials/main.png)
+
+<a id="key-features"></a>
 ## ✨ Key Features
 
 ### 🧠 End-to-End Research Coverage
@@ -52,6 +54,7 @@ Users simply specify the target dataset, and the system automatically recommends
 
 ---
 
+<a id="quick-start"></a>
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -88,6 +91,7 @@ openclaw list-skills | grep -i eeg
 
 ---
 
+<a id="project-structure"></a>
 ## 📁 Project Structure
 
 ```
@@ -139,6 +143,7 @@ NeuroClaw/
 
 ---
 
+<a id="skill-quick-reference"></a>
 ## 🛠️ Skill Quick Reference
 
 ### Base Layer
@@ -237,6 +242,7 @@ Subagent in NeuroClaw includes four categories: **tool**, **model**, **dataset**
 ---
 
 
+<a id="acknowledgments"></a>
 ## 🙏 Acknowledgments
 
 Thanks to:
