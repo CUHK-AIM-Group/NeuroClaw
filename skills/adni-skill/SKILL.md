@@ -13,6 +13,11 @@ It coordinates a fixed two-stage pipeline:
 1. Prepare ADNI data into BIDS and run fMRIPrep.
 2. Run DK68 ROI extraction with QC.
 
+It also provides an **optional VQA generation path** for VLM use cases:
+- Reorganize ADNI data and convert DICOM to NIfTI.
+- Generate task labels (task1-task5).
+- Generate VQA pairs from task outputs.
+
 This skill follows NeuroClaw hierarchy:
 - Defines **WHAT to do**, not low-level implementation details.
 - Does **not** execute direct shell commands itself.
@@ -28,7 +33,8 @@ This skill follows NeuroClaw hierarchy:
 3. Wait for explicit confirmation (`YES` / `execute` / `proceed`).
 4. On confirmation, prepare BIDS staging and run fMRIPrep.
 5. After fMRIPrep success, run DK68 ROI pipeline with QC.
-6. Save outputs into an ADNI-centered structure under `adni_output/`.
+6. If VQA generation is requested, run the three VQA scripts and save outputs.
+7. Save outputs into an ADNI-centered structure under `adni_output/`.
 
 ---
 
@@ -145,12 +151,125 @@ python run_dk68_pipeline_qc.py \
 
 ---
 
+## Optional: VQA Generation (for VLM)
+
+This path uses the reference scripts under `skills/adni-skill/scripts/`:
+- `reorganize_adni.py`
+- `generate_adni_task_files.py`
+- `generate_vqa_from_tasks.py`
+
+If your ADNI data follows the **direct ADNI download layout**, these scripts can be used directly. Otherwise, adjust paths and assumptions in the scripts to match your local layout.
+
+### VQA Task Chain
+**(1) Anatomical & Imaging Assessment -> (2) Lesion Identification & Localization -> (3) Diagnostic Synthesis -> (4) Prognostic Judgment & Risk Forecasting -> (5) Therapeutic Cycle Management**
+
+### Quick Usage (Three Scripts)
+Run the following commands under the ADNI root (example: `data/omnibrainbench_extend`):
+
+1) Reorganize ADNI and convert DICOM to NIfTI
+
+```bash
+python reorganize_adni.py --cmd dcm2niix
+```
+
+Optional cleanup after conversion:
+
+```bash
+python reorganize_adni.py --cmd dcm2niix --cleanup
+```
+
+2) Generate task label files (task1-task5)
+
+```bash
+python generate_adni_task_files.py --root . --outdir task_outputs
+```
+
+By default this does not execute task1 (FreeSurfer) or task4 (WMH) segmentation; it only checks eligibility and writes CSV/shell commands.
+
+Run task1 now:
+
+```bash
+python generate_adni_task_files.py --root . --outdir task_outputs --run-task1
+```
+
+Run task4 now:
+
+```bash
+python generate_adni_task_files.py --root . --outdir task_outputs --run-task4
+```
+
+Run task1 and task4 together:
+
+```bash
+python generate_adni_task_files.py --root . --outdir task_outputs --run-task1 --run-task4
+```
+
+3) Generate VQA pairs from task outputs
+
+```bash
+python generate_vqa_from_tasks.py --task-dir task_outputs --outdir vqa_outputs
+```
+
+### Data Preparation Notes
+Expected per-subject layout for the VQA scripts:
+
+```
+ADNI_ROOT/
+  sub-0001/
+    T1.nii
+    FLAIR.nii
+  sub-0002/
+    T1.nii
+    FLAIR.nii
+```
+
+Convert DICOM to NIfTI with `dcm2niix`, then rename outputs to `T1.nii` and `FLAIR.nii`:
+
+```bash
+dcm2niix -z y -o /path/to/output_nifti /path/to/input_dicom_folder
+```
+
+---
+
+### Label Sources Used by VQA
+
+1) Anatomical structure identification (FreeSurfer)
+- Dataset: UCSF - Cross-Sectional FreeSurfer (7.x) [ADNI1, GO, 2, 3, 4]
+- CSV: `UCSFFSX7_03Mar2026.csv`
+- QC filter: keep `OVERALLQC = 1`
+
+2) Imaging modality identification
+- `T1.nii` -> T1W
+- `FLAIR.nii` -> FLAIR
+- `PD.nii` -> PD
+
+3) Disease/abnormality diagnosis (cognitive status)
+- Table: Diagnostic Summary [ADNI1, GO, 2, 3, 4]
+- CSV: `DXSUM_03Mar2026.csv`
+- Label mapping: `1 = CN`, `2 = MCI`, `3 = Dementia`
+
+4) Lesion localization (WMH segmentation)
+Use MARS-WMH nnU-Net (Docker):
+
+```bash
+docker pull ghcr.io/miac-research/wmh-nnunet:latest
+docker tag ghcr.io/miac-research/wmh-nnunet:latest mars-wmh-nnunet:latest
+docker run --rm --gpus all -v $(pwd):/data mars-wmh-nnunet:latest --flair /data/FLAIR.nii --t1 /data/T1w.nii
+```
+
+5) Risk forecasting and treatment-related labels (longitudinal)
+- Group records by subject ID across multiple visits
+- Track diagnosis changes (e.g., CN -> MCI, MCI -> Dementia) for progression risk labels
+
+---
+
 ## Recommended Output Layout
 All assets should be organized under `./adni_output/`:
 - `adni_output/bids/` (staged BIDS data)
 - `adni_output/fmriprep/` (fMRIPrep derivatives)
 - `adni_output/dk68/` (ROI CSVs)
 - `adni_output/qc/` (QC metrics)
+- `adni_output/vqa/` (VQA task outputs)
 - `adni_output/logs/`
 
 ---
@@ -166,12 +285,14 @@ All assets should be organized under `./adni_output/`:
 - ADNI subject naming must be normalized (e.g., `130_S_0969` -> `130S0969`).
 - fMRIPrep requires FreeSurfer license and sufficient disk space.
 - DK68 pipeline assumes `aparc+aseg.mgz` is available in fMRIPrep outputs.
+- VQA scripts assume a subject-per-folder layout; adapt scripts if your ADNI organization differs.
 
 ---
 
 ## When to Call This Skill
 - User asks for ADNI end-to-end processing (fMRI + T1).
 - User needs BIDS staging + fMRIPrep + DK68 ROI outputs.
+- User requests VQA generation for VLM from ADNI.
 
 ---
 
@@ -190,6 +311,7 @@ All assets should be organized under `./adni_output/`:
 ## Reference
 - fMRIPrep: https://fmriprep.org/
 - BIDS spec: https://bids.neuroimaging.io/
+- OmniBrainBench: https://github.com/CUHK-AIM-Group/OmniBrainBench
 
 Created At: 2026-03-28 20:38 HKT
 Last Updated At: 2026-03-28 20:38 HKT
