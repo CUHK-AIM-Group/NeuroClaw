@@ -1,5 +1,5 @@
 ---
-name: fm-app
+name: fm_app
 description: "Use this model doc whenever the user wants to run FM-APP for phenotype prediction using fMRI ROI features and optional sMRI features. This document provides model-level usage and delegates preprocessing to fmri-skill and smri-skill."
 license: MIT License (NeuroClaw custom skill - freely modifiable within the project)
 ---

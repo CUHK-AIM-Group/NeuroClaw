@@ -2,6 +2,8 @@
 
 # NeuroClaw: Data-and-Model Centric Platform for Neuroscience Research
 
+[中文版 README](README_zh.md)
+
 <div align="center">
 
 [Features](#-key-features) • [Quick Start](#-quick-start) • [Project Structure](#-project-structure) • [Skills](#%EF%B8%8F-skill-quick-reference) • [Acknowledgments](#-acknowledgments)
@@ -18,6 +20,10 @@
 Neuroimaging datasets demand specialized preprocessing, and preprocessing quality directly determines model validity. Many workflows assume curated datasets, while MedicalClaw provides limited automation for open-source model execution (primarily large projects like TimesFM and AlphaFold), leaving users to spend significant time on environment configuration.
 
 NeuroClaw prioritizes **data processing** and **model configuration/execution**. It remains an end-to-end Claw system, but for neuroscience its center of gravity is data and models.
+
+**Notes**
+- We manually test each skill in materials/examples and store the chat logs there. If you run into issues, check the examples first.
+- Each SKILL.md ends with the author information; please open an issue to the corresponding author if you have questions.
 
 
 ![NeuroClaw Overview](materials/main.png)
@@ -58,7 +64,7 @@ Users simply specify the target dataset, and the system automatically recommends
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python >= 3.8
+- Python >= 3.10
 - OpenClaw framework installed
 - Git
 
@@ -99,9 +105,9 @@ NeuroClaw/
 ├── README.md                       # This file
 ├── USER.md                         # User-defined configurations and preferences
 ├── SOUL.md                         # System behavior guidelines and principles
-├── skills/                         # Flat skill directory (logical grouping in docs)
-│   ├── adni-skill/
+├── skills/                         # Flat skill directory
 │   ├── academic-research-hub/
+│   ├── adni-skill/
 │   ├── bids-organizer/
 │   ├── claw-shell/
 │   ├── conda-env-manager/
@@ -131,11 +137,13 @@ NeuroClaw/
 │   ├── qsiprep-tool/
 │   ├── research-idea/
 │   ├── run_models/
+│   ├── skill-updater/
 │   ├── smri-skill/
 │   └── wmh-segmentation/
 │
 ├── materials/                      # Research materials and reference resources
-│   └── CVPR_2026/
+│   ├── CVPR_2026/
+│   └── examples/
 │
 └── LICENSE                         # License
 
@@ -194,6 +202,7 @@ Subagent in NeuroClaw includes four categories: **tool**, **model**, **dataset**
 | `wmh-segmentation` | White matter hyperintensity segmentation (MARS-WMH nnU-Net) | ✅ |
 | `brain_gnn` | BrainGNN: graph neural network for fMRI classification | ✅ |
 | `fm_app` | FM-APP: multi-stage phenotype prediction with fMRI+sMRI | ✅ |
+| `neurostorm` | NeuroStorm: neuroimaging foundation model | ✅ |
 
 #### Dataset
 | Skill | Function | Status |
@@ -221,10 +230,9 @@ Subagent in NeuroClaw includes four categories: **tool**, **model**, **dataset**
 - ✓ Hierarchical architecture design (Interface-Subagent-Base Tool)
 - ✓ Complete Interface layer implementation
 - ✓ Subagent coordination mechanisms
-- ☐ Enhanced task orchestration
 
 ### Dataset Ecosystem
-- ☐ Complete ADNI processing chain
+- ✓ Complete ADNI processing chain
 - ✓ HCP dataset adaptation
 - ☐ UK Biobank adaptation
 - ☐ Multi-dataset workflow support
@@ -233,7 +241,6 @@ Subagent in NeuroClaw includes four categories: **tool**, **model**, **dataset**
 - ✓ Automatic paper model retrieval
 - ✓ Automatic environment configuration
 - ☐ Reproducibility verification
-- ☐ Model versioning and tracking
 
 ### Community & Extensions
 - ☐ Multi-institution collaboration capabilities
