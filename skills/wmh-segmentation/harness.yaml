@@ -1,0 +1,55 @@
+skill: wmh-segmentation
+version: "1.0"
+description: >
+  Harness spec for wmh-segmentation. Tests verify that the MARS-WMH nnU-Net
+  Docker inference produces a valid 3-D binary segmentation mask with at least
+  one non-zero voxel. Inputs are a minimal FLAIR + T1w NIfTI pair.
+
+test_cases:
+  - name: smoke_wmh_docker
+    type: smoke
+    description: >
+      Pull the MARS-WMH Docker image, run inference on a minimal FLAIR + T1w
+      pair, and verify that a segmentation mask NIfTI file is produced in the
+      output directory.
+    inputs:
+      - key: flair
+        path: materials/examples/sample_data/wmh/sub-01_FLAIR.nii.gz
+      - key: t1w
+        path: materials/examples/sample_data/wmh/sub-01_T1w.nii.gz
+    expected_outputs:
+      - path: wmh_output/sub-01_wmh_mask.nii.gz
+        assertions:
+          exists: true
+          voxel_size_mm:
+            min: 0.5
+            max: 3.0
+          file_size_bytes:
+            min: 4096
+    timeout_seconds: 900              # Docker pull + GPU inference can take ~15 min
+    env_requires: [nibabel, numpy, pyyaml]
+
+  - name: output_mask_validity
+    type: output-validity
+    description: >
+      Verify that an already-produced WMH mask is a valid 3-D binary NIfTI:
+      non-empty, values in {0, 1}, voxel size in clinical range, and at least
+      100 non-zero voxels (guards against trivially empty predictions).
+    inputs:
+      - key: wmh_mask
+        path: wmh_output/sub-01_wmh_mask.nii.gz
+    expected_outputs:
+      - path: wmh_output/sub-01_wmh_mask.nii.gz
+        assertions:
+          exists: true
+          voxel_size_mm:
+            min: 0.5
+            max: 3.0
+          value_range:
+            min: 0.0
+            max: 1.0
+          min_nonzero_voxels: 100
+          file_size_bytes:
+            min: 4096
+    timeout_seconds: 120
+    env_requires: [nibabel, numpy, pyyaml]

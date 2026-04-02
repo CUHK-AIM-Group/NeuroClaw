@@ -125,6 +125,7 @@ NeuroClaw/
 │   ├── fsl-tool/
 │   ├── git-essentials/
 │   ├── git-workflows/
+│   ├── harness-engineering/
 │   ├── hcp-skill/
 │   ├── hcppipeline-tool/
 │   ├── method-design/
@@ -169,7 +170,7 @@ NeuroClaw/
 | `overleaf-skill` | Overleaf sync and collaborative manuscript operations | ✅ |
 | `academic-research-hub` | Multi-source academic search and paper retrieval | ✅ |
 | `bids-organizer` | Base skill for organizing raw data into BIDS structure | ✅ |
-| `auto-qc` | Automated quality control for newly added skills | ⏳ |
+| `harness-engineering` | Automated skill validation, smoke/regression/output-validity testing for neuroimaging pipelines | ✅ |
 
 ### Interface Layer (Task Orchestration)
 | Skill | Function | Status |
@@ -230,6 +231,7 @@ Subagent in NeuroClaw includes four categories: **tool**, **model**, **dataset**
 - ✓ Hierarchical architecture design (Interface-Subagent-Base Tool)
 - ✓ Complete Interface layer implementation
 - ✓ Subagent coordination mechanisms
+- ✓ Harness Engineering (skill validation & neuroimaging output QC)
 
 ### Dataset Ecosystem
 - ✓ Complete ADNI processing chain

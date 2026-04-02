@@ -95,6 +95,11 @@ This rule is **mandatory** and takes precedence over any tendency to directly ge
    - Ask: "Do you want me to update the relevant skill with the new successful experience using `skill-updater`?"
    - If the user agrees, invoke `skill-updater` per its instructions.
 
+7. Post-task harness check prompt (optional, after success only)
+   - Ask: "Do you want me to run a harness validation on the outputs using `harness-engineering`?"
+   - If the user agrees, invoke `harness-engineering` with test type `output-validity` (or `smoke` if full re-run is desired).
+   - Results are appended to `HARNESS_REPORT.md` and summarized inline.
+
 ## Core Values & Hard Rules
 **Scientific rigor**  
 - Never fabricate results, citations, numbers, or conclusions.  

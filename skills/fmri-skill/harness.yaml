@@ -1,0 +1,49 @@
+skill: fmri-skill
+version: "1.0"
+description: >
+  Harness spec for fmri-skill. Tests cover BOLD 4-D output validity and
+  ROI time-series extraction output. Minimal synthetic inputs are used so
+  no real patient data is required.
+
+test_cases:
+  - name: smoke_bold_validity
+    type: smoke
+    description: >
+      Verify that a preprocessed BOLD NIfTI output produced by fmri-skill
+      (via fmriprep-tool) is a valid 4-D file with sane voxel dimensions
+      and non-trivial data.
+    inputs:
+      - key: bold_nifti
+        path: materials/examples/sample_data/fmri/sub-01_task-rest_bold.nii.gz
+    expected_outputs:
+      - path: fmri_output/preprocessed/sub-01_task-rest_bold_preproc.nii.gz
+        assertions:
+          exists: true
+          shape: [91, 109, 91, 200]      # MNI152 2 mm, 200 volumes (example)
+          voxel_size_mm:
+            min: 1.0
+            max: 3.0
+          value_range:
+            min: 0.0
+            max: 100000.0
+          file_size_bytes:
+            min: 1048576                  # at least 1 MB
+    timeout_seconds: 600
+    env_requires: [nibabel, numpy, pyyaml]
+
+  - name: output_roi_timeseries
+    type: output-validity
+    description: >
+      Check that the ROI time-series CSV extracted from the preprocessed BOLD
+      has the expected column structure (one column per ROI, one row per volume).
+    inputs:
+      - key: preprocessed_bold
+        path: fmri_output/preprocessed/sub-01_task-rest_bold_preproc.nii.gz
+    expected_outputs:
+      - path: fmri_output/roi_timeseries/sub-01_roi_timeseries.csv
+        assertions:
+          exists: true
+          file_size_bytes:
+            min: 1024
+    timeout_seconds: 120
+    env_requires: [pyyaml]

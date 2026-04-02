@@ -1,0 +1,50 @@
+skill: eeg-skill
+version: "1.0"
+description: >
+  Harness spec for eeg-skill. Tests verify that EEG feature matrices produced
+  by eeg-skill (via mne-eeg-tool) have the expected shape, value range, and
+  file completeness. Minimal synthetic .fif input is used.
+
+test_cases:
+  - name: smoke_eeg_features
+    type: smoke
+    description: >
+      Verify that running the eeg-skill feature extraction pipeline on a minimal
+      EEG recording produces a valid per-band power matrix (.npy) and a
+      Mel-spectrogram tensor (.pt).
+    inputs:
+      - key: raw_eeg
+        path: materials/examples/sample_data/eeg/sub-01_task-rest_eeg.fif
+    expected_outputs:
+      - path: eeg_output/features/sub-01_band_power.npy
+        assertions:
+          exists: true
+          file_size_bytes:
+            min: 256
+      - path: eeg_output/spectrograms/sub-01_mel_spectrogram.pt
+        assertions:
+          exists: true
+          file_size_bytes:
+            min: 256
+    timeout_seconds: 300
+    env_requires: [numpy, pyyaml]
+
+  - name: output_band_power_range
+    type: output-validity
+    description: >
+      Check that per-band power values are non-negative and below a physically
+      plausible upper bound (no NaN, no negative power).
+    inputs:
+      - key: band_power_npy
+        path: eeg_output/features/sub-01_band_power.npy
+    expected_outputs:
+      - path: eeg_output/features/sub-01_band_power.npy
+        assertions:
+          exists: true
+          value_range:
+            min: 0.0
+            max: 1.0e+12          # physically implausible upper bound as guard
+          file_size_bytes:
+            min: 256
+    timeout_seconds: 60
+    env_requires: [numpy, pyyaml]
