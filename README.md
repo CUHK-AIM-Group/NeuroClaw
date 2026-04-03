@@ -1,6 +1,8 @@
 <div align="center">
 
-# NeuroClaw: Data-and-Model Centric Platform for Neuroscience Research
+<img src="materials/logo.png" alt="NeuroClaw Logo" width="200" />
+
+# NeuroClaw: From Raw Data to Reproducible Models
 
 [中文版 README](README_zh.md)
 
@@ -72,7 +74,7 @@ Users simply specify the target dataset, and the system automatically recommends
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/your-org/NeuroClaw.git
+   git clone https://github.com/CUHK-AIM-Group/NeuroClaw.git
    cd NeuroClaw
    ```
 
