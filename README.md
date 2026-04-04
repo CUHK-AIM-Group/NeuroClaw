@@ -55,6 +55,13 @@ Users simply specify the target dataset, and the system automatically recommends
 - **Environment Isolation**: Virtual environments and containerization avoid system pollution
 - **Verifiable Processes**: Complete logging and result tracking
 
+### 🔐 Harness Engineering
+- **Self-Verification**: Built-in validation checks for all skill outputs (BIDS compliance, data integrity, statistical bounds, artifact quality)
+- **Reproducible Logging**: Timestamped JSONL audit trails with SHA256 hashing and PII scrubbing for full experiment traceability
+- **Checkpointing & Recovery**: Automatic phase checkpoints with LZ4 compression; resume interrupted tasks from last verified state
+- **Drift Detection**: Continuous monitoring for data/model distribution shifts (KL divergence, latency, failure rate) with configurable thresholds
+- **Environment Reproducibility**: Automatic capture and verification of Python versions, package dependencies, CUDA, and system configurations
+
 ### 🤝 OpenClaw Compatibility
 - Fully compatible with [OpenClaw](https://github.com/openclaw/openclaw) framework, can be installed directly into existing OpenClaw environments
 - skills, materials, USER.md, SOUL.md files integrate seamlessly
@@ -171,7 +178,7 @@ NeuroClaw/
 | `overleaf-skill` | Overleaf sync and collaborative manuscript operations | ✅ |
 | `academic-research-hub` | Multi-source academic search and paper retrieval | ✅ |
 | `bids-organizer` | Base skill for organizing raw data into BIDS structure | ✅ |
-| `auto-qc` | Automated quality control for newly added skills | ⏳ |
+| `harness-core` | Harness engineering SDK (verification, checkpointing, audit logging, drift detection) | ✅ |
 
 ### Interface Layer (Task Orchestration)
 | Skill | Function | Status |
@@ -242,7 +249,7 @@ Subagent in NeuroClaw includes four categories: **tool**, **model**, **dataset**
 ### Model Reproduction & Execution
 - ✓ Automatic paper model retrieval
 - ✓ Automatic environment configuration
-- ☐ Reproducibility verification
+- ✓ Full Harness Engineering for Reproducibility
 
 ### Community & Extensions
 - ☐ Multi-institution collaboration capabilities

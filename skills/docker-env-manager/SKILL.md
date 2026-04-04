@@ -97,16 +97,240 @@ if __name__ == "__main__":
     parser.add_argument("--request", required=True, help="User request (pull/run/compose/prune...)")
     parser.add_argument("--dry-run", action="store_true", help="Only show plan")
     args = parser.parse_args()
+```
 
-    print("Docker snapshot:")
-    print(get_docker_info())
-    print("GPU status:", check_gpu())
+## Harness-Aware Container Isolation & Security Standards
 
-    print("\nRequest:", args.request)
-    print("Generating safe Docker plan following NeuroClaw best practices...")
-    print("All execution will be routed through claw-shell.")
-    print("Plan preview would appear here.")
-    print("Waiting for explicit user confirmation before any real execution.")
+All Docker operations performed via docker-env-manager **must** enforce strict isolation, security boundaries, and reproducibility standards.
+
+### Container Specification Format (Declarative Registry)
+
+Each containerized skill **must** include a Docker specification manifest:
+
+**File**: `skills/{skill_name}/docker-spec.json`
+
+```json
+{
+  "skill_name": "wmh-segmentation",
+  "container_name": "neuroclaw-wmh-seg",
+  "image": "ghcr.io/miac-research/wmh-nnunet:latest",
+  "image_hash": "sha256:abc123...",
+  "container_security": {
+    "read_only_root": true,
+    "cap_drop": ["ALL"],
+    "cap_add": ["NET_BIND_SERVICE"],
+    "security_opts": ["no-new-privileges:true"],
+    "user": "1000:1000",
+    "privileged": false
+  },
+  "resource_limits": {
+    "memory_limit": "16G",
+    "memory_swap": "16G",
+    "cpus": "4",
+    "pids_limit": 512,
+    "ulimits": {
+      "nofile": 1024,
+      "nproc": 512
+    }
+  },
+  "network_config": {
+    "network": "bridge",
+    "expose_ports": [],
+    "environment_whitelist": [
+      "CUDA_VISIBLE_DEVICES",
+      "TORCH_HOME"
+    ]
+  },
+  "volume_mounts": {
+    "/data": {
+      "bind": "{data_path}",
+      "mode": "ro",
+      "required": true
+    },
+    "/output": {
+      "bind": "{output_path}",
+      "mode": "rw",
+      "required": true
+    },
+    "/tmp": {
+      "bind": "/dev/shm",
+      "mode": "rw",
+      "size_limit": "8G"
+    }
+  },
+  "gpu_config": {
+    "enabled": true,
+    "device_ids": "all",
+    "driver_capabilities": "compute,utility"
+  },
+  "logging": {
+    "driver": "json-file",
+    "options": {
+      "max-size": "10m",
+      "max-file": "3"
+    }
+  }
+}
+```
+
+### Container Execution Protocol
+
+**Step 1: Pre-execution container validation**
+```bash
+# Verify image integrity
+docker inspect ${image_hash} --format='{{.RepoDigests}}'
+
+# Check for vulnerabilities (if vulnerability scanner available)
+trivy image --severity HIGH,CRITICAL ${image}
+
+# Verify GPU access
+nvidia-smi -L  # List all GPUs
+
+# Pre-flight resource check
+docker stats --no-stream ${existing_container_name} || true
+```
+
+**Step 2: Secure container creation**
+Template (auto-generated based on docker-spec.json):
+```bash
+docker run \
+  --name ${CONTAINER_NAME} \
+  --rm \
+  --read-only \
+  --cap-drop=ALL \
+  --security-opt=no-new-privileges:true \
+  --user 1000:1000 \
+  --memory=${MEMORY_LIMIT} \
+  --memory-swap=${MEMORY_LIMIT} \
+  --cpus=${CPU_LIMIT} \
+  --pids-limit=512 \
+  --gpus=all \
+  --env CUDA_VISIBLE_DEVICES=${GPU_DEVICES} \
+  -v ${DATA_PATH}:/data:ro \
+  -v ${OUTPUT_PATH}:/output:rw \
+  -v /dev/shm:/tmp:rw \
+  --log-driver=json-file \
+  --log-opt max-size=10m \
+  --log-opt max-file=3 \
+  --network=bridge \
+  ${IMAGE} \
+  ${COMMAND}
+```
+
+**Step 3: Post-execution audit logging**
+```json
+{
+  "execution_time": "2026-04-05T14:32:00Z",
+  "container_id": "abc123def456",
+  "image": "ghcr.io/miac-research/wmh-nnunet:latest",
+  "command": "python inference.py --input /data --output /output",
+  "exit_code": 0,
+  "resource_usage": {
+    "memory_peak_mb": 8192,
+    "cpu_time_seconds": 1203.5,
+    "gpu_memory_peak_mb": 6144,
+    "io_read_bytes": 5368709120,
+    "io_write_bytes": 2684354560
+  },
+  "security_events": [],
+  "status": "SUCCESS"
+}
+```
+
+### Data Privacy & Isolation Guardrails
+
+**Mandatory privacy checks before container execution**:
+
+1. **Input data anonymization verification**:
+   - Scan for known PII patterns (patient IDs, medical record numbers, names, birthdates)
+   - Flag any unredacted identifiable information
+   - Hash-verify input against reference dataset (prevent contamination)
+
+2. **Output post-processing**:
+   - Scan generated files for embedded PII or metadata
+   - Automatically redact timestamps, user paths from logs
+   - Generate sanitized output copies for sharing
+
+3. **Filesystem sandboxing audit**:
+   - Verify no mounts point to system directories (/, /etc, /root, /home)
+   - Enforce read-only root filesystem
+   - Whitelist environment variables (drop all except approved list)
+
+**Generated audit report** (`container_privacy_audit.json`):
+```json
+{
+  "container": "wmh-seg-20260405",
+  "privacy_scan": {
+    "input_files_scanned": 50,
+    "pii_detected": 0,
+    "output_files_sanitized": 50,
+    "suspicious_environment_vars": 0,
+    "mount_violations": 0,
+    "status": "CLEARED"
+  },
+  "isolation_verification": {
+    "readonly_root": true,
+    "privilege_dropping": true,
+    "network_isolation": true,
+    "capability_dropping": true
+  }
+}
+```
+
+### Container Reproducibility & Layer Verification
+
+**Image integrity checking** (SHA256 verification at run time):
+
+```bash
+# Pull image and verify digest
+EXPECTED_DIGEST="sha256:abc123..."
+docker pull ${IMAGE}
+ACTUAL_DIGEST=$(docker inspect ${IMAGE} --format='{{index .RepoDigests 0}}' | cut -d'@' -f2)
+
+if [ "$EXPECTED_DIGEST" != "$ACTUAL_DIGEST" ]; then
+  echo "ERROR: Image digest mismatch. Potential supply chain attack."
+  exit 1
+fi
+```
+
+**Layer-by-layer audit trail** (`container_layer_manifest.json`):
+```json
+{
+  "image": "ghcr.io/miac-research/wmh-nnunet:latest",
+  "total_layers": 12,
+  "base_image": "nvidia/cuda:12.1-cudnn8-runtime-ubuntu22.04",
+  "layers": [
+    {
+      "layer_index": 0,
+      "digest_sha256": "def456...",
+      "size_bytes": 1234567,
+      "instruction": "FROM nvidia/cuda:12.1-cudnn8-runtime-ubuntu22.04"
+    },
+    {
+      "layer_index": 1,
+      "digest_sha256": "ghi789...",
+      "size_bytes": 567890,
+      "instruction": "RUN apt-get update && apt-get install -y python3-dev..."
+    }
+  ],
+  "final_image_hash": "sha256:abc123...",
+  "verification_timestamp": "2026-04-05T14:20:00Z"
+}
+```
+
+### Checkpoint & Resume with Container State
+
+Long-running containerized tasks support state persistence:
+
+```bash
+# 1. Create checkpoint from running container
+docker checkpoint create ${CONTAINER_ID} checkpoint_20260405_143000
+
+# 2. Auto-saved checkpoint metadata
+docker checkpoint ls ${CONTAINER_ID}  # Lists all available checkpoints
+
+# 3. Resume from checkpoint (if host supports CRIU)
+docker start --checkpoint checkpoint_20260405_143000 ${CONTAINER_ID}
 ```
 
 ## Important Notes & Limitations
@@ -138,5 +362,5 @@ Custom interface-layer skill for NeuroClaw, addressing containerized environment
 
 ---
 Created At: 2026-03-25 23:08 HKT  
-Last Updated At: 2026-03-25 23:08 HKT  
-Author: Cheng Wang
+Last Updated At: 2026-04-05 02:01 HKT 
+Author: chengwang96

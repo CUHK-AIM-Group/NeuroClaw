@@ -160,4 +160,4 @@ Store cookie temporarily in `.secrets/overleaf_cookie.txt` (never commit it). Re
 
 Created At: 2026-03-23 20:00 HKT  
 Last Updated At: 2026-03-26 00:25 HKT  
-Author: Cheng Wang
+Author: chengwang96

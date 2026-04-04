@@ -201,8 +201,63 @@ Documentation: https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferWiki
 
 Custom NeuroClaw skill created to integrate FreeSurfer safely into the hierarchical skill structure.
 
+## Post-Execution Verification (Harness Integration)
+
+After FreeSurfer processing completes, this skill **automatically invokes harness-core's VerificationRunner** to validate output integrity:
+
+**Integrated verification checks**:
+
+```python
+from skills.harness_core import VerificationRunner, AuditLogger
+
+verifier = VerificationRunner(task_type="freesurfer_processing")
+
+# 1. Brain-extracted anatomy files
+verifier.add_check("brain_extraction",
+    checker=lambda: verify_brain_extraction(subjects_dir, subjid),
+    severity="error"
+)
+
+# 2. Cortical surface files (white, pial)
+verifier.add_check("surface_reconstruction",
+    checker=lambda: verify_surface_files(subjects_dir, subjid),
+    severity="error"
+)
+
+# 3. Cortical thickness bounds (1–4 mm range)
+verifier.add_check("thickness_bounds",
+    checker=lambda: verify_cortical_thickness_range(subjects_dir, subjid),
+    severity="warning"
+)
+
+# 4. parcellation labels (aparc/aseg)
+verifier.add_check("parcellation",
+    checker=lambda: verify_aparc_aseg(subjects_dir, subjid),
+    severity="error"
+)
+
+# 5. Statistics file completeness
+verifier.add_check("statistics",
+    checker=lambda: verify_stats_files(subjects_dir, subjid),
+    severity="warning"
+)
+
+report = verifier.run(subjects_dir)
+
+# Log verification results
+logger = AuditLogger(log_file=f"{subjects_dir}/{subjid}/freesurfer_verification.jsonl")
+logger.log_validation(
+    task_name="freesurfer_processing",
+    subject_id=subjid,
+    checks_passed=len([r for r in report.results if r.passed]),
+    total_checks=len(report.results)
+)
+```
+
+**Output**: `{SUBJECTS_DIR}/{subjid}/freesurfer_verification.jsonl` (structured audit log with JSONL format)
+
 ---
 
 Created At: 2026-03-19 20:00 HKT  
-Last Updated At: 2026-03-25 23:46 HKT  
+Last Updated At: 2026-04-05 02:03 HKT  
 Author: chengwang96

@@ -216,12 +216,94 @@ if __name__ == "__main__":
 - User requests “run QSIPrep”, “preprocess DWI with QSIPrep”, “BIDS diffusion preprocessing”, “topup/eddy style pipeline with QC reports”.
 - Before any quantitative diffusion features (FA/MD/tractometry/connectome) are extracted.
 
----
+## Post-Execution Verification (Harness Integration)
+
+After QSIPrep completes, this skill **automatically invokes harness-core's VerificationRunner** to validate diffusion preprocessing outputs:
+
+**Integrated verification checks**:
+
+```python
+from skills.harness_core import VerificationRunner, AuditLogger
+import nibabel as nib
+import numpy as np
+from pathlib import Path
+
+verifier = VerificationRunner(task_type="qsiprep_diffusion_preprocessing")
+
+# 1. Preprocessed DWI files exist
+verifier.add_check("preprocessed_dwi_exists",
+    checker=lambda: verify_preprocessed_dwi_files(output_dir),
+    severity="error"
+)
+
+# 2. Brain mask generated
+verifier.add_check("brain_mask_generated",
+    checker=lambda: verify_brain_mask_exists(output_dir),
+    severity="error"
+)
+
+# 3. DWI data shape consistent and reasonable
+verifier.add_check("dwi_shape_consistency",
+    checker=lambda: verify_dwi_shape(output_dir),
+    severity="error"
+)
+
+# 4. No NaN/Inf in preprocessed DWI
+verifier.add_check("dwi_data_integrity",
+    checker=lambda: verify_dwi_no_nan_inf(output_dir),
+    severity="error"
+)
+
+# 5. Gradient table preserved and reasonable
+verifier.add_check("gradient_table",
+    checker=lambda: verify_bval_bvec_files(output_dir),
+    severity="warning"
+)
+
+# 6. Motion/susceptibility distortion corrections applied
+verifier.add_check("preprocessing_applied",
+    checker=lambda: verify_preprocessing_flags(output_dir),
+    severity="warning"
+)
+
+# 7. Diffusion metrics (FA/MD) computable from output
+verifier.add_check("diffusion_metric_bounds",
+    checker=lambda: verify_fa_md_bounds(output_dir),
+    severity="warning"
+)
+
+# 8. QC reports generated
+verifier.add_check("qc_reports",
+    checker=lambda: verify_qc_html_reports(output_dir),
+    severity="warning"
+)
+
+report = verifier.run(output_dir)
+
+# Log verification results
+logger = AuditLogger(log_file=f"{output_dir}/qsiprep_verification.jsonl")
+logger.log_validation(
+    task_name="qsiprep_diffusion_preprocessing",
+    checks_passed=len([r for r in report.results if r.passed]),
+    checks_failed=len([r for r in report.results if not r.passed]),
+    warnings=len([r for r in report.results if r.severity == "warning" and not r.passed]),
+    report_summary=report.to_dict()
+)
+
+if report.failed:
+    raise ValueError(f"QSIPrep verification failed: {report.summary}")
+```
+
+**Output files generated**:
+- `{output_dir}/qsiprep_verification.jsonl` — structured audit log
+- `{output_dir}/.qsiprep_verification_timestamp` — completion marker
 
 ## Complementary / Related Skills
+
 - `dependency-planner` → install Docker/Apptainer + QSIPrep image
 - `docker-env-manager` → safe Docker operations (pull/run/prune) when needed
 - `claw-shell` → mandatory safe execution layer
+- `harness-core` → automated verification and audit logging
 
 ---
 
@@ -230,5 +312,5 @@ if __name__ == "__main__":
 - NeuroClaw interface-layer pattern aligned with `fmriprep-tool` and `hcppipeline-tool`
 
 Created At: 2026-03-26 00:45 HKT
-Last Updated At: 2026-03-26 00:49 HKT
+Last Updated At: 2026-04-05 02:01 HKT
 Author: chengwang96

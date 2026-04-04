@@ -253,6 +253,69 @@ conda run -n neuroclaw-dipy python skills/dipy-tool/dipy_pipeline.py \
 - DIPY DTI reconstruction examples (tensor fitting + FA/MD/AD/RD)
 - Aligned with NeuroClaw base/tool skill pattern (`mne-eeg-tool`, etc.)
 
+## Post-Execution Verification (Harness Integration)
+
+After DIPY processing completes, this skill **automatically invokes harness-core's VerificationRunner** to validate output integrity:
+
+**Integrated verification checks**:
+
+```python
+from skills.harness_core import VerificationRunner, AuditLogger
+
+verifier = VerificationRunner(task_type="dipy_dti_processing")
+
+# 1. DWI file loading and shape validation
+verifier.add_check("dwi_loading",
+    checker=lambda: verify_dwi_loaded(output_dir),
+    severity="error"
+)
+
+# 2. Brain mask existence and coverage
+verifier.add_check("brain_mask",
+    checker=lambda: verify_brain_mask(output_dir),
+    severity="error"
+)
+
+# 3. Gradient table validity (bvals/bvecs)
+verifier.add_check("gradient_table",
+    checker=lambda: verify_gradient_table(output_dir),
+    severity="error"
+)
+
+# 4. Tensor metrics bounds (FA: 0–1, MD/AD/RD: reasonable μm²/ms)
+verifier.add_check("tensor_bounds",
+    checker=lambda: verify_tensor_metrics_bounds(output_dir),
+    severity="warning"
+)
+
+# 5. Data integrity (NaN/Inf checks)
+verifier.add_check("data_integrity",
+    checker=lambda: verify_no_nan_inf(output_dir),
+    severity="error"
+)
+
+# 6. ROI statistics shape (if extracted)
+verifier.add_check("roi_statistics",
+    checker=lambda: verify_roi_stats_shape(output_dir),
+    severity="warning"
+)
+
+report = verifier.run(output_dir)
+
+# Log verification results
+logger = AuditLogger(log_file=f"{output_dir}/dipy_verification.jsonl")
+logger.log_validation(
+    task_name="dipy_dti_processing",
+    checks_passed=len([r for r in report.results if r.passed]),
+    total_checks=len(report.results),
+    output_path=output_dir
+)
+```
+
+**Output**: `{output_dir}/dipy_verification.jsonl` (structured audit log with JSONL format)
+
+---
+
 Created At: 2026-03-26 00:40 HKT
-Last Updated At: 2026-03-26 00:43 HKT
+Last Updated At: 2026-04-05 02:03 HKT
 Author: chengwang96

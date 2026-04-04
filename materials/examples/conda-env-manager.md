@@ -352,7 +352,7 @@ Custom interface-layer skill for NeuroClaw, addressing environment setup gaps id
 ---
 Created At: 2026-03-19 01:45 HKT  
 Last Updated At: 2026-03-25 16:32 HKT  
-Author: Cheng Wang
+Author: chengwang96
 
 ## Assistant (2026-03-31T11:23:17.200Z)
 

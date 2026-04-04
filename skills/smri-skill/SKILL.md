@@ -174,9 +174,83 @@ All outputs must be written under `./smri_output/`:
 ## When to Call This Skill
 - Any request involving: T1w/T2w/FLAIR preprocessing, brain extraction, tissue segmentation, MNI registration, cortical thickness, FreeSurfer recon-all, HCP structural pipeline, WMH segmentation, or ROI-wise structural features.
 
----
+## Post-Execution Verification (Harness Integration)
+
+After structural MRI processing completes, this skill **automatically invokes harness-core's VerificationRunner** to validate structural derivatives:
+
+**Integrated verification checks**:
+
+```python
+from skills.harness_core import VerificationRunner, AuditLogger
+import nibabel as nib
+import numpy as np
+
+verifier = VerificationRunner(task_type="structural_mri_processing")
+
+# 1. Structural brain extraction quality
+verifier.add_check("brain_extraction_mask",
+    checker=lambda: verify_brain_mask_exists(output_dir),
+    severity="error"
+)
+
+# 2. Tissue segmentation (GM/WM/CSF) available and reasonable
+verifier.add_check("tissue_segmentation",
+    checker=lambda: verify_tissue_maps_integrity(output_dir),
+    severity="error"
+)
+
+# 3. MNI registration transforms
+verifier.add_check("mni_registration",
+    checker=lambda: verify_mni_transforms(output_dir),
+    severity="warning"
+)
+
+# 4. Cortical surface files (if FreeSurfer)
+verifier.add_check("cortical_surfaces",
+    checker=lambda: verify_freesurfer_surfaces(output_dir),
+    severity="warning"
+)
+
+# 5. No NaN/Inf in structural maps
+verifier.add_check("structural_data_integrity",
+    checker=lambda: verify_structural_no_nan_inf(output_dir),
+    severity="error"
+)
+
+# 6. Cortical thickness reasonable range (if available)
+verifier.add_check("cortical_thickness_bounds",
+    checker=lambda: verify_thickness_range(output_dir, min_mm=1.0, max_mm=4.0),
+    severity="warning"
+)
+
+# 7. Volume statistics plausible
+verifier.add_check("volume_statistics",
+    checker=lambda: verify_tissue_volume_ratios(output_dir),
+    severity="warning"
+)
+
+report = verifier.run(output_dir)
+
+# Log verification results
+logger = AuditLogger(log_file=f"{output_dir}/structural_verification.jsonl")
+logger.log_validation(
+    task_name="structural_mri_processing",
+    checks_passed=len([r for r in report.results if r.passed]),
+    checks_failed=len([r for r in report.results if not r.passed]),
+    warnings=len([r for r in report.results if r.severity == "warning" and not r.passed]),
+    report_summary=report.to_dict()
+)
+
+if report.failed:
+    raise ValueError(f"Structural MRI verification failed: {report.summary}")
+```
+
+**Output files generated**:
+- `{output_dir}/structural_verification.jsonl` — structured audit log
+- `{output_dir}/.structural_verification_timestamp` — completion marker
 
 ## Complementary / Related Skills
+
 - `dcm2nii` → DICOM → NIfTI
 - `fsl-tool` → fsl_anat / BET / FAST / FIRST / registration utilities
 - `freesurfer-tool` → cortical & subcortical morphometry + thickness/parcellation
@@ -188,6 +262,7 @@ All outputs must be written under `./smri_output/`:
 - `nii2dcm` → export final NIfTI results back to DICOM
 - `dependency-planner` + `conda-env-manager` → installation/environment management
 - `claw-shell` → mandatory safe execution layer
+- `harness-core` → automated verification and audit logging
 
 ---
 
@@ -196,5 +271,5 @@ Aligned with NeuroClaw modality-skill pattern (see `fmri-skill`, `dti-skill`, `e
 Common sMRI toolchain: FSL (fast structural utilities), FreeSurfer (surface morphometry), HCP pipelines (HCP-grade structural processing), fMRIPrep (BIDS anatomical derivatives), Nilearn (ROI features on NIfTI maps), MARS-WMH (WMH segmentation via Docker).
 
 Created At: 2026-03-26 1:09 HKT
-Last Updated At: 2026-03-28 17:43 HKT
+Last Updated At: 2026-04-05 02:01 HKT
 Author: chengwang96

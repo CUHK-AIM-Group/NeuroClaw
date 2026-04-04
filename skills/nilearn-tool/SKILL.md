@@ -116,6 +116,63 @@ conda install -n neuroclaw-nilearn -c conda-forge nilearn nibabel numpy scipy pa
 - Nilearn documentation: https://nilearn.github.io/
 - fMRIPrep confounds interface: Nilearn `nilearn.interfaces.fmriprep`
 
+## Post-Execution Verification (Harness Integration)
+
+After Nilearn processing completes, this skill **automatically invokes harness-core's VerificationRunner** to validate output integrity:
+
+**Integrated verification checks**:
+
+```python
+from skills.harness_core import VerificationRunner, AuditLogger
+
+verifier = VerificationRunner(task_type="nilearn_processing")
+
+# 1. ROI time series shape and completeness
+verifier.add_check("roi_timeseries",
+    checker=lambda: verify_roi_timeseries(output_dir),
+    severity="error"
+)
+
+# 2. Confounds loading and application
+verifier.add_check("confounds_handling",
+    checker=lambda: verify_confounds_applied(output_dir),
+    severity="warning"
+)
+
+# 3. Connectivity matrix dimensionality (N_ROI × N_ROI)
+verifier.add_check("connectivity_shape",
+    checker=lambda: verify_connectome_shape(output_dir),
+    severity="error"
+)
+
+# 4. Correlation bounds (-1 to +1)
+verifier.add_check("correlation_bounds",
+    checker=lambda: verify_correlation_bounds(output_dir),
+    severity="warning"
+)
+
+# 5. Data integrity (NaN/Inf checks)
+verifier.add_check("data_integrity",
+    checker=lambda: verify_no_nan_inf(output_dir),
+    severity="error"
+)
+
+report = verifier.run(output_dir)
+
+# Log verification results
+logger = AuditLogger(log_file=f"{output_dir}/nilearn_verification.jsonl")
+logger.log_validation(
+    task_name="nilearn_processing",
+    checks_passed=len([r for r in report.results if r.passed]),
+    total_checks=len(report.results),
+    output_path=output_dir
+)
+```
+
+**Output**: `fmri_output/nilearn_verification.jsonl` (structured audit log with JSONL format)
+
+---
+
 Created At: 2026-03-26 0:54 HKT
-Last Updated At: 2026-03-26 0:54 HKT
+Last Updated At: 2026-04-05 02:03 HKT
 Author: chengwang96

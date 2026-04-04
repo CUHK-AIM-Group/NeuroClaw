@@ -265,6 +265,69 @@ if __name__ == "__main__":
 Official MNE-Python documentation (https://mne.tools) + MNE-Connectivity + mne-microstates.  
 Aligned with NeuroClaw base/tool skill pattern (freesurfer-tool, dcm2nii, etc.).
 
+## Post-Execution Verification (Harness Integration)
+
+After MNE-EEG processing completes, this skill **automatically invokes harness-core's VerificationRunner** to validate output integrity:
+
+**Integrated verification checks**:
+
+```python
+from skills.harness_core import VerificationRunner, AuditLogger
+
+verifier = VerificationRunner(task_type="eeg_processing")
+
+# 1. EEG file loading success
+verifier.add_check("eeg_loading",
+    checker=lambda: verify_eeg_loaded(output_dir),
+    severity="error"
+)
+
+# 2. Channel count and data shape
+verifier.add_check("channel_integrity",
+    checker=lambda: verify_channel_count(output_dir),
+    severity="error"
+)
+
+# 3. Artifact removal success (ICA, AutoReject)
+verifier.add_check("artifact_removal",
+    checker=lambda: verify_artifact_removal_rate(output_dir, min_rate=0.85),
+    severity="warning"
+)
+
+# 4. Frequency spectrum sanity (not all zeros, reasonable power)
+verifier.add_check("frequency_spectrum",
+    checker=lambda: verify_frequency_spectrum(output_dir),
+    severity="warning"
+)
+
+# 5. Data range and NaN/Inf checks
+verifier.add_check("data_integrity",
+    checker=lambda: verify_no_nan_inf(output_dir),
+    severity="error"
+)
+
+# 6. Connectivity/Features output shape
+verifier.add_check("feature_extraction",
+    checker=lambda: verify_feature_dimensions(output_dir),
+    severity="warning"
+)
+
+report = verifier.run(output_dir)
+
+# Log verification results
+logger = AuditLogger(log_file=f"{output_dir}/eeg_verification.jsonl")
+logger.log_validation(
+    task_name="eeg_processing",
+    checks_passed=len([r for r in report.results if r.passed]),
+    total_checks=len(report.results),
+    output_path=output_dir
+)
+```
+
+**Output**: `eeg_output/eeg_verification.jsonl` (structured audit log with JSONL format)
+
+---
+
 Created At: 2026-03-25 14:00 HKT  
-Last Updated At: 2026-03-26 00:16 HKT  
+Last Updated At: 2026-04-05 02:03 HKT  
 Author: chengwang96

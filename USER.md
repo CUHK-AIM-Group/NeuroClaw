@@ -28,4 +28,81 @@
 - Often works evenings and late nights in HKT  
 - Values clear progress tracking and structured weekly summaries  
 
+## Harness Engineering Configuration (User Preferences)
+
+### Self-Correction & Verification
+- **Auto-correction enabled**: Yes (default)
+- **Max auto-correction attempts**: 3 (halt and ask user after 3 failures)
+- **Self-correction scope**: data integrity checks, environment verification, output validation
+- **Behavior on verification failure**: Log error + suggest manual review (do not silently skip)
+
+### Statistical Thresholds & Quality Gates
+- **Data integrity checks** (enabled by default):
+  - NaN/Inf tolerance: 0% (fail if any detected in critical outputs)
+  - Value range deviation: flag if >10% of values outside expected bounds
+  - Distribution shift (KL divergence): alert if >0.15 (warning), >0.25 (error)
+  
+- **Processing quality gates**:
+  - Artifact removal success rate: target ≥95% (warn if <95%, fail if <85%)
+  - Brain extraction Dice score: target ≥0.95 (warn if lower)
+  - Motion parameter outliers: flag if >5% of frames exceed 0.5mm FD
+  - Preprocessing convergence: require explicit success log before marking complete
+
+- **Model inference thresholds**:
+  - Prediction confidence: warn if <0.7 on binary classification
+  - Latency drift: alert if inference time increases >20% vs. baseline
+  - Output value bounds: error if predictions out of plausible range
+
+### Logging & Persistence Strategy
+- **Audit log format**: JSONL (JSON Lines) — one structured event per line
+- **Audit log location**: `{workspace_root}/logs/audit_{YYYY-MM-DD}.jsonl` (rotated daily)
+- **Metadata captured per event**:
+  - Timestamp (ISO 8601 UTC + HKT offset)
+  - Event type (phase_success, phase_failure, verification_pass, verification_fail, drift_detected, etc.)
+  - Task/skill name and session ID
+  - Relevant metrics (checksums, execution time, resource usage, error messages)
+  - PII scrubbing: automatic redaction of patient IDs, file paths, email addresses
+
+- **Checkpoint strategy**:
+  - Auto-save checkpoint after each major phase (every 15–30 min for long tasks)
+  - Checkpoint retention: keep last 5 checkpoints + current (auto-cleanup older files)
+  - Compression: use LZ4 compression (fast + good ratio) for checkpoint storage
+  - Checkpoint integrity: verify SHA256 hash before resuming
+
+- **Log retention**:
+  - Audit logs: keep for 90 days (exportable to archive before deletion)
+  - Checkpoints: keep for 30 days (can be manually extended)
+  - QC reports: keep indefinitely (stored alongside processed data)
+  - Old logs movable to `logs/archive/` on request
+
+- **Persistence triggers** (logs flushed to disk immediately):
+  - End of phase execution (success or failure)
+  - Completion of verification suite
+  - Any error condition
+  - Drift detection alert
+  - Manual checkpoint request
+
+### Experiment Reproducibility Preferences
+- **Environment manifest capture**: Automatic (include Python version, packages, CUDA, OS)
+- **Hash verification**: Enabled for all output artifacts (SHA256, stored alongside outputs)
+- **Reproducibility report generation**: Automatic (after skill execution completes)
+- **Re-run behavior**: Warn if re-running with different environment; prompt for explicit approval if environment mismatch detected
+
+### Privacy & Security Defaults
+- **PII redaction**: Enabled for all logs and reports (auto-detect and redact patient IDs, filenames, paths)
+- **Docker sandboxing**: Preferred for containerized skills (enforce read-only root, capability dropping)
+- **Permission model**: Principle of least privilege (restrict file access to explicit paths)
+- **Data access logging**: Log all data file reads/writes with timestamp and brief reason
+
+### Drift Detection & Monitoring
+- **Continuous monitoring**: Enabled (monitor after every 50 inferences or per skill execution)
+- **Supported detectors**: KL divergence (data distribution), latency shift (timing), failure rate (errors)
+- **Alert thresholds** (can be overridden per-skill):
+  - Data KL divergence: warn >0.1, error >0.2
+  - Latency increase: warn if >20%, error if >50%
+  - Failure rate: warn if >1%, error if >5%
+- **Alert action**: Log to audit trail, generate drift report, ask user before continuing
+
+---
+
 Update this file whenever new preferences or context are provided.

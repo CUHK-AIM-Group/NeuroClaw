@@ -100,6 +100,171 @@ if __name__ == "__main__":
     print("Waiting for explicit user confirmation before any real execution.")
 ```
 
+## Reproducible Environment Specification Standard
+
+All conda environments created/managed by this skill **must** include comprehensive reproducibility metadata following the NeuroClaw standard.
+
+### Environment Archival Format
+
+After each environment creation or significant update, **conda-env-manager** generates the following audit trail:
+
+**1. Canonical environment file** (`environment-{env_name}-lock.yml`):
+```yaml
+name: neuroclaw-dl
+channels:
+  - pytorch
+  - conda-forge  
+  - defaults
+dependencies:
+  - python=3.11.0=h6de4bd8_0_cpython
+  - pytorch::pytorch::=2.1.2=py3.11_cuda12.1_cudnn8.9.5_0
+  - pytorch::cudatoolkit=12.1=h6de4bd8_0
+  - conda-forge::numpy=1.24.3=py311h8315ce3_0
+  - conda-forge::scipy=1.11.4=py311hf2f185e_3
+  - pip
+  - pip::nibabel==5.1.0
+  - pip::torch-geometric==2.3.1
+variables:
+  CUDA_HOME: /opt/conda/envs/neuroclaw-dl
+platforms:
+  - linux-64
+metadata:
+  created_at: "2026-04-05T14:22:00Z"
+  created_by: "conda-env-manager/NeuroClaw"
+  python_version: "3.11.0"
+  pytorch_cuda: "12.1"
+  system_hash: "sha256:abc123..."
+```
+
+**2. Machine-portable environment file** (`environment-{env_name}-portable.yml`):
+```yaml
+name: neuroclaw-dl
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11.*
+  - pytorch::pytorch=2.1.*
+  - pytorch::torchvision
+  - conda-forge::numpy>=1.24
+  - conda-forge::scipy>=1.11
+  - pip
+  - pip::nibabel>=5.1.0
+# Use this for cross-platform recreations
+```
+
+**3. Environment metadata manifest** (`environment-{env_name}-manifest.json`):
+```json
+{
+  "environment_name": "neuroclaw-dl",
+  "created_at": "2026-04-05T14:22:00Z",
+  "created_by": "conda-env-manager",
+  "conda_version": "23.3.1",
+  "python_version": "3.11.0",
+  "system_info": {
+    "os": "Linux",
+    "kernel": "5.15.0-106-generic",
+    "arch": "x86_64"
+  },
+  "cuda_config": {
+    "cuda_version": "12.1",
+    "cudnn_version": "8.9.5",
+    "gpu_compute_capability": "8.6"
+  },
+  "package_count": 42,
+  "total_size_mb": 8320,
+  "dependencies": {
+    "python": {
+      "version": "3.11.0",
+      "build_string": "h6de4bd8_0_cpython",
+      "hash_sha256": "abc123...",
+      "channel": "defaults"
+    },
+    "pytorch": {
+      "version": "2.1.2",
+      "build_string": "py3.11_cuda12.1_cudnn8.9.5_0",
+      "hash_sha256": "def456...",
+      "channel": "pytorch"
+    }
+  },
+  "integrity": {
+    "manifest_hash": "sha256:xyz789...",
+    "lockfile_hash": "sha256:uvw456...",
+    "verification_timestamp": "2026-04-05T14:23:00Z"
+  },
+  "installation_method": "conda_env_create",
+  "notes": []
+}
+```
+
+### Reproducibility Verification Protocol
+
+When recreating an environment from lock file, **conda-env-manager** automatically:
+
+1. **Pre-creation validation**:
+   - Parse lock file SHA256 hash and verify integrity
+   - Check CUDA version compatibility with host system
+   - Estimate required disk space and verify availability
+   
+2. **Post-creation verification** (automated after `conda env create`):
+   - Run `conda list --json` and compare package versions against lock file
+   - Verify all pip packages match with `pip list --format=json`
+   - Execute Python import test: `python -c "import torch; print(torch.__version__)"`
+   - Compare against stored manifest hash
+   
+3. **Generate verification report** (`environment-{env_name}-verify-report.json`):
+```json
+{
+  "environment_name": "neuroclaw-dl",
+  "verified_at": "2026-04-05T14:25:00Z",
+  "verification_status": "SUCCESS",
+  "package_count": 42,
+  "conda_packages_verified": 42,
+  "pip_packages_verified": 3,
+  "failed_imports": [],
+  "warnings": [],
+  "reproducibility_score": 1.0,
+  "lock_file_match": true
+}
+```
+
+### Environment Snapshot at Experiment Checkpoints
+
+Every experiment executed with this conda environment automatically captures:
+
+```
+experiment_20260405_143000_checkpoint/
+├── environment_locked.yml (exact snapshot at checkpoint time)
+├── environment_manifest.json
+├── python_packages_frozenlist.txt
+├── pip_freeze_output.txt
+├── cuda_info.json
+│   {
+│     "nvcc_version": "12.1",
+│     "driver_version": "555.42",
+│     "gcc_version": "11.4.0"
+│   }
+└── environment_restoration_guide.md
+    # Instructions for reproducing this exact environment on another machine
+```
+
+### Environment Branching & Experiment Variants
+
+For ablation studies or variant experiments, **conda-env-manager** supports safe environment cloning:
+
+```bash
+# Clone environment for variant testing
+conda create --name neuroclaw-dl-v2 --clone neuroclaw-dl
+
+# Auto-generates:
+# - environment-neuroclaw-dl-v2-lock.yml (exact clone specification)
+# - environment-neuroclaw-dl-v2-manifest.json
+# - clone-metadata.json (tracks parent environment + clone timestamp)
+```
+
+Cloned environments remain **independent** but **traceable** for result comparison and rollback.
+
 ## Important Notes & Limitations
 
 - **User confirmation is mandatory** — no silent destructive actions
@@ -129,5 +294,5 @@ Custom interface-layer skill for NeuroClaw, addressing environment setup gaps id
 
 ---
 Created At: 2026-03-19 01:45 HKT  
-Last Updated At: 2026-03-25 16:32 HKT  
-Author: Cheng Wang
+Last Updated At: 2026-04-05 02:01 HKT 
+Author: chengwang96

@@ -95,6 +95,41 @@ This rule is **mandatory** and takes precedence over any tendency to directly ge
    - Ask: "Do you want me to update the relevant skill with the new successful experience using `skill-updater`?"
    - If the user agrees, invoke `skill-updater` per its instructions.
 
+## Harness Engineering Principles
+Quality, reliability, and safety standards for all skills, workflows, and experimental execution. These principles are **mandatory** and apply across all code generation, skill development, and external integrations.
+
+**1. Self-verification for all skills**
+- Every skill execution must include built-in validation steps:
+  - **Pre-checks**: verify input data integrity, required dependencies, and parameter constraints before execution
+  - **Post-checks**: validate output correctness, check for anomalies or corruption in results
+  - **Data integrity checks**: verify checksums, array dimensions, normalization ranges, or domain-specific invariants
+  - **Error recovery modes**: graceful failure with diagnostic information, rollback capabilities, and detailed error reporting
+- Skills must report diagnostic information and logs for debugging and audit trails
+
+**2. Reproducible experiment logging with hash verification**
+- All experimental results must automatically generate comprehensive, timestamped logs including:
+  - Execution context: environment name, Python version, dependency versions, OS, hardware specs
+  - Hyperparameters and random seeds used for reproducibility
+  - Start/end timestamps and total execution time
+  - Intermediate checkpoints and validation metrics
+- Each result artifact must be accompanied by cryptographic hash verification (SHA256 or equivalent):
+  - Generate hash for every output file (model weights, predictions, statistics)
+  - Store hash alongside results for later integrity verification
+  - Provide automated hash validation tools for result reproduction and contamination detection
+
+**3. Context compression and checkpointing for long-running tasks**
+Long-running tasks (model training, large-scale data processing, simulation) must support resumption without loss:
+  - **Checkpoint saving**: save complete execution state at regular, configurable intervals
+  - **Context compression strategy**: compress execution state (summary statistics, pruning non-essential weights/metadata) to reduce storage overhead
+  - **Resumption from checkpoint**: restore state and continue without data loss or redundant recomputation
+  - **Memory footprint tracking**: track and log peak memory usage; implement policies to optimize memory consumption during long runs
+
+**4. Security guardrails**
+All skill execution must enforce strict security boundaries:
+  - **Data privacy**: exclude sensitive identifiers (patient IDs, names, personal info) from all logs; anonymize or redact personal data in outputs
+  - **Docker sandboxing**: containerize skill execution when feasible to isolate impacts on the host system; prevent resource exhaustion or unauthorized file access
+  - **Principle of least privilege**: execute skills with minimal required permissions (restrict file access to explicit paths, disable network unless required, minimize system call privileges)
+
 ## Core Values & Hard Rules
 **Scientific rigor**  
 - Never fabricate results, citations, numbers, or conclusions.  

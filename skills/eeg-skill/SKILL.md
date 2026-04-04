@@ -95,10 +95,92 @@ def extract_band_power(signal, fs=256):
 - The user provides raw or partially processed EEG data and requests preprocessing, Mel-spectrogram conversion, frequency-band energy extraction, feature engineering, or a full pipeline.
 - After `research-idea` or `method-design` when the experiment involves EEG data.
 
+## Post-Execution Verification (Harness Integration)
+
+After EEG processing completes, this skill **automatically invokes harness-core's VerificationRunner** to validate preprocessed data quality:
+
+**Integrated verification checks**:
+
+```python
+from skills.harness_core import VerificationRunner, AuditLogger
+import numpy as np
+import mne
+
+verifier = VerificationRunner(task_type="eeg_preprocessing")
+
+# 1. EEG data file exists and is readable
+verifier.add_check("eeg_file_integrity",
+    checker=lambda: verify_eeg_file_readable(output_dir),
+    severity="error"
+)
+
+# 2. Channel count matches expected
+verifier.add_check("channel_count",
+    checker=lambda: verify_expected_channels(output_dir, expected_count=64),
+    severity="warning"
+)
+
+# 3. No excessive bad segments (after artifact removal)
+verifier.add_check("artifact_removal_success",
+    checker=lambda: verify_bad_segments_removed(output_dir, max_pct=5),
+    severity="warning"
+)
+
+# 4. Data range plausible (not clipped or saturated)
+verifier.add_check("data_range_plausible",
+    checker=lambda: verify_data_range(output_dir, min_range=-500, max_range=500),
+    severity="error"
+)
+
+# 5. No NaN/Inf values in preprocessed data
+verifier.add_check("no_nan_inf",
+    checker=lambda: verify_no_nan_inf(output_dir),
+    severity="error"
+)
+
+# 6. Frequency spectrum reasonable (no DC offset, reasonable content)
+verifier.add_check("frequency_spectrum",
+    checker=lambda: verify_frequency_spectrum(output_dir),
+    severity="warning"
+)
+
+# 7. Epoching statistics (if applicable)
+verifier.add_check("epoch_statistics",
+    checker=lambda: verify_epoch_count_and_length(output_dir),
+    severity="warning"
+)
+
+# 8. Feature extraction output dimensions
+verifier.add_check("feature_matrix_shape",
+    checker=lambda: verify_feature_matrix_shape(output_dir),
+    severity="warning"
+)
+
+report = verifier.run(output_dir)
+
+# Log verification results
+logger = AuditLogger(log_file=f"{output_dir}/eeg_verification.jsonl")
+logger.log_validation(
+    task_name="eeg_preprocessing",
+    checks_passed=len([r for r in report.results if r.passed]),
+    checks_failed=len([r for r in report.results if not r.passed]),
+    warnings=len([r for r in report.results if r.severity == "warning" and not r.passed]),
+    report_summary=report.to_dict()
+)
+
+if report.failed:
+    raise ValueError(f"EEG preprocessing verification failed: {report.summary}")
+```
+
+**Output files generated**:
+- `{output_dir}/eeg_verification.jsonl` — structured audit log
+- `{output_dir}/.eeg_verification_timestamp` — completion marker
+
 ## Complementary / Related Skills
 
 - `dependency-planner` + `conda-env-manager` → environment and package installation (MNE-Python + torchaudio + scipy)
 - `mne-eeg-tool` → base/tool layer that contains all specific implementation code
+- `harness-core` → automated verification and audit logging
 
 ## Reference & Source
 
@@ -107,5 +189,5 @@ Core libraries: MNE-Python (main), `torchaudio.transforms.MelSpectrogram` (wavef
 
 ---
 Created At: 2026-03-25 16:00 HKT  
-Last Updated At: 2026-03-25 22:07 HKT  
-Author: Cheng Wang
+Last Updated At: 2026-04-05 02:01 HKT
+Author: chengwang96

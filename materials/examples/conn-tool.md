@@ -500,7 +500,7 @@ Custom core skill designed for NeuroClaw to provide safe, tmux-based shell execu
 ---
 Created At: 2026-03-19 20:00 HKT  
 Last Updated At: 2026-03-25 16:22 HKT  
-Author: Cheng Wang
+Author: chengwang96
 
 ## Assistant (2026-04-01T16:09:37.104Z)
 

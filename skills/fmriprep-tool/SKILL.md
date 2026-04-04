@@ -127,10 +127,86 @@ if __name__ == "__main__":
 - Before advanced analysis (GLM, connectivity, MVPA, etc.).
 - After `dcm2nii` when converting raw scanner data to BIDS format.
 
+## Post-Execution Verification (Harness Integration)
+
+After fMRIPrep completes, this skill **automatically invokes harness-core's VerificationRunner** to validate preprocessing output quality:
+
+**Integrated verification checks**:
+
+```python
+from skills.harness_core import VerificationRunner, AuditLogger
+import json
+from pathlib import Path
+
+verifier = VerificationRunner(task_type="fmriprep_preprocessing")
+
+# 1. Output directory structure
+verifier.add_check("output_structure",
+    checker=lambda: verify_fmriprep_output_structure(output_dir),
+    severity="error"
+)
+
+# 2. Preprocessed BOLD integrity
+verifier.add_check("bold_preprocessing",
+    checker=lambda: verify_bold_files_exist(output_dir),
+    severity="error"
+)
+
+# 3. Anatomical derivatives (T1w, brain mask)
+verifier.add_check("anatomical_derivatives",
+    checker=lambda: verify_anatomical_space_files(output_dir),
+    severity="error"
+)
+
+# 4. Motion parameters / confounds file
+verifier.add_check("confounds_available",
+    checker=lambda: verify_confounds_files(output_dir),
+    severity="warning"
+)
+
+# 5. No NaN/Inf in preprocessed BOLD data
+verifier.add_check("bold_data_integrity",
+    checker=lambda: verify_bold_no_nan_inf(output_dir),
+    severity="error"
+)
+
+# 6. QC reports generated
+verifier.add_check("qc_reports",
+    checker=lambda: verify_qc_reports_exist(output_dir),
+    severity="warning"
+)
+
+# 7. fMRIPrep HTML report accessible
+verifier.add_check("html_report",
+    checker=lambda: Path(output_dir).glob("**/report.html"),
+    severity="warning"
+)
+
+report = verifier.run(output_dir)
+
+# Log verification results
+logger = AuditLogger(log_file=f"{output_dir}/fmriprep_verification.jsonl")
+logger.log_validation(
+    task_name="fmriprep_preprocessing",
+    checks_passed=len([r for r in report.results if r.passed]),
+    checks_failed=len([r for r in report.results if not r.passed]),
+    warnings=len([r for r in report.results if r.severity == "warning" and not r.passed]),
+    report_summary=report.to_dict()
+)
+
+if report.failed:
+    raise ValueError(f"fMRIPrep verification failed: {report.summary}")
+```
+
+**Output files generated**:
+- `{output_dir}/fmriprep_verification.jsonl` — structured audit log
+- `{output_dir}/.fmriprep_verification_timestamp` — verification completion marker
+
 ## Complementary / Related Skills
 
 - `dependency-planner` → install fMRIPrep and dependencies
 - `claw-shell` → safe execution of long-running pipeline
+- `harness-core` → automated verification and audit logging
 
 ## More Advanced Features
 
@@ -144,5 +220,5 @@ You may use the `multi-search-engine` or `academic-research-hub` skill to retrie
 ---
 
 Created At: 2026-03-25 17:10 HKT  
-Last Updated At: 2026-03-25 23:37 HKT  
-Author: Cheng Wang
+Last Updated At: 2026-04-05 02:01 HKT  
+Author: chengwang96

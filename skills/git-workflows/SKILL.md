@@ -537,7 +537,7 @@ git push origin --delete v1.2.0  # Remote
 Advanced git workflows skill for NeuroClaw. Complements `git-essentials` for basic operations.
 
 **Complementary / Related Skills**
-- `git-essentials` → basic git operations
+- `claw-shell` → all Git commands are safely executed through claw-shell
 
 Created At: 2026-03-19  
 Last Updated At: 2026-03-26 00:01 HKT  

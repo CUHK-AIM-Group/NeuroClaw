@@ -143,8 +143,63 @@ For less common tools (ASL, FABBER, VBM, PALM, custom scripting, etc.), please r
 
 You may use the `multi-search-engine`, `academic-research-hub`, or `arxiv-cli-tools` skill anytime to find the latest FSL tutorials or example pipelines.
 
+## Post-Execution Verification (Harness Integration)
+
+After FSL processing completes, this skill **automatically invokes harness-core's VerificationRunner** to validate output integrity:
+
+**Integrated verification checks**:
+
+```python
+from skills.harness_core import VerificationRunner, AuditLogger
+
+verifier = VerificationRunner(task_type="fsl_processing")
+
+# 1. Brain extraction quality (BET)
+verifier.add_check("brain_extraction",
+    checker=lambda: verify_bet_output(output_dir),
+    severity="error"
+)
+
+# 2. FSL output files existence
+verifier.add_check("output_files",
+    checker=lambda: verify_output_files(output_dir),
+    severity="error"
+)
+
+# 3. Data integrity (NaN/Inf checks)
+verifier.add_check("data_integrity",
+    checker=lambda: verify_no_nan_inf(output_dir),
+    severity="error"
+)
+
+# 4. Registration quality metrics
+verifier.add_check("registration_quality",
+    checker=lambda: verify_registration_quality(output_dir),
+    severity="warning"
+)
+
+# 5. Tensor metrics bounds (for DTI/DWI)
+verifier.add_check("tensor_bounds",
+    checker=lambda: verify_fa_md_bounds(output_dir),
+    severity="warning"
+)
+
+report = verifier.run(output_dir)
+
+# Log verification results
+logger = AuditLogger(log_file=f"{output_dir}/fsl_verification.jsonl")
+logger.log_validation(
+    task_name="fsl_processing",
+    checks_passed=len([r for r in report.results if r.passed]),
+    total_checks=len(report.results),
+    output_path=output_dir
+)
+```
+
+**Output**: `{output_dir}/fsl_verification.jsonl` (structured audit log with JSONL format)
+
 ---
 
 Created At: 2026-03-25 00:00 HKT  
-Last Updated At: 2026-03-25 23:56 HKT  
-Author: Cheng Wang
+Last Updated At: 2026-04-05 02:03 HKT  
+Author: chengwang96

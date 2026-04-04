@@ -105,7 +105,62 @@ if __name__ == "__main__":
 - CONN Documentation: https://web.conn-toolbox.org/documentation
 - Aligned with NeuroClaw modality-skill pattern (see `fmri-skill`, `eeg-skill`).
 
+## Post-Execution Verification (Harness Integration)
+
+After CONN processing completes, this skill **automatically invokes harness-core's VerificationRunner** to validate output integrity:
+
+**Integrated verification checks**:
+
+```python
+from skills.harness_core import VerificationRunner, AuditLogger
+
+verifier = VerificationRunner(task_type="conn_connectivity_analysis")
+
+# 1. CONN project file creation
+verifier.add_check("project_file",
+    checker=lambda: verify_conn_project_exists(output_dir),
+    severity="error"
+)
+
+# 2. ROI extraction success
+verifier.add_check("roi_extraction",
+    checker=lambda: verify_roi_extracted(output_dir),
+    severity="error"
+)
+
+# 3. Connectivity matrices existence and shape
+verifier.add_check("connectivity_matrices",
+    checker=lambda: verify_connectivity_matrices(output_dir),
+    severity="error"
+)
+
+# 4. Statistical maps (Z-scores, p-values)
+verifier.add_check("statistical_maps",
+    checker=lambda: verify_stat_maps(output_dir),
+    severity="warning"
+)
+
+# 5. Data integrity in connectivity results
+verifier.add_check("data_integrity",
+    checker=lambda: verify_no_nan_inf_in_conn(output_dir),
+    severity="error"
+)
+
+report = verifier.run(output_dir)
+
+# Log verification results
+logger = AuditLogger(log_file=f"{output_dir}/conn_verification.jsonl")
+logger.log_validation(
+    task_name="conn_connectivity_analysis",
+    checks_passed=len([r for r in report.results if r.passed]),
+    total_checks=len(report.results),
+    output_path=output_dir
+)
+```
+
+**Output**: `{output_dir}/conn_verification.jsonl` (structured audit log with JSONL format)
+
 ---
 Created At: 2026-03-25 16:10 HKT  
-Last Updated At: 2026-03-25 16:10 HKT  
-Author: Cheng Wang
+Last Updated At: 2026-04-05 02:03 HKT  
+Author: chengwang96

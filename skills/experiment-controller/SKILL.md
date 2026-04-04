@@ -30,6 +30,73 @@ It acts as the Experiment Manager within the multi-agent framework:
 | 6. Run Experiment | Execute training/inference/ablation     | 06_run_log_*.md (per run) |
 | 7. Record Results | Append metrics + observations           | EXPERIMENT.md             |
 
+## Harness Engineering Protocol (Mandatory for Reproducibility)
+
+All experiments executed via experiment-controller **must** follow the **Task Decomposition → Agent Initialization → Execution → Verification** protocol to ensure self-validation, auditability, and resumability.
+
+### Phase 1: Task Decomposition
+- Parse experimental goal from METHOD.md into discrete tasks (data preprocessing, feature extraction, model training, inference, evaluation)
+- Define success criteria for each task (BIDS format compliance, feature vector shape/range, metric thresholds)
+- Identify cross-task dependencies and data flow
+- Output: `experiment_task_manifest.json` with task graph
+
+### Phase 2: Agent Initialization
+- **Pre-flight checks**: verify all dependencies installed, data paths accessible, Docker/GPU resources available (if required)
+- **Environment snapshot**: capture Python version, library versions, hardware specs, random seeds → `environment_manifest.json`
+- **Checkpoint management**: determine checkpoint frequency, rollback strategy, memory constraints
+- **Logging setup**: initialize structured logging with unique experiment session ID (timestamp + hash)
+
+### Phase 3: Execution with Incremental Logging
+- Execute each task with **real-time progress tracking**
+- Save checkpoint after each completed task (enables resumption on failure)
+- Log detailed metrics, intermediate outputs, and timing information
+- Generate cryptographic hash (SHA256) for each output artifact
+- Stream results to EXPERIMENT.md in real-time sections with timestamps
+
+### Phase 4: Verification and Post-Execution Validation
+- **Self-verification checks** (module-specific):
+  - Preprocessing: verify BIDS compliance, check for NaN/Inf values, validate normalization ranges
+  - Feature extraction: check output shape consistency, verify statistical properties (mean/std within expected bounds)
+  - Model training: validate loss curve smoothness, check for NaN gradients, verify train/val split integrity
+  - Inference: cross-check predictions for domain-specific constraints (probability bounds, anatomical plausibility)
+- **Result integrity validation**:
+  - Recompute hash of all output files and compare with stored values
+  - Flag any mismatches as potential corruption/tampering
+- **Generate final audit report**: `experiment_audit_report.md` with task execution times, success/failure status, verification results, and reproducibility metadata
+
+### Self-Verification Implementation Details
+
+Each skill integrated into experiment-controller must include **automatic validation steps**:
+
+**Preprocessing validation**:
+```
+- BIDS compliance: confirm file naming, JSON sidecars, required fields
+- Data integrity: NaN/Inf count, range of pixel values, histogram sanity check
+- Statistical bounds: mean/std within neuroimaging norms (e.g., T1w intensity ~0-4000 HU)
+```
+
+**Feature extraction validation**:
+```
+- Output shape check: row/column count match expected dataset size
+- Distribution check: ensure features are not constant or degenerate
+- Correlations: detect and warn on features with >0.95 mutual correlation
+```
+
+**Training validation**:
+```
+- Loss curve smoothness: flag sudden spikes or plateau too early
+- Gradient health: ensure no NaN/Inf gradients during backprop
+- Validation metric monotonicity (for early stopping): warn if validation improves inconsistently
+- Train/val split: cross-verify split ratio and no subject leakage
+```
+
+**Inference validation**:
+```
+- Output shape consistency: predictions match expected target cardinality
+- Domain constraints: probability predictions in [0,1], regression outputs within physiologically plausible ranges
+- Batch effect check: compare results across batch sizes (should be near-identical with same seed)
+```
+
 ## Installation
 ```bash
 # Place files in: skills/experiment-controller/
@@ -63,6 +130,6 @@ NeuroClaw architecture (section 1.7 experiment-controller skill).
 Flow: literature/GitHub search → user-confirmed scheme → git clone → dependency setup → iterative execution → EXPERIMENT.md logging.  
 
 ---
-Created At: 2026-03-24  HKT  
-Last Updated At: 2026-03-25 23:05  HKT  
+Created At: 2026-03-24 HKT  
+Last Updated At: 2026-04-05 02:01 HKT
 Author: chengwang96

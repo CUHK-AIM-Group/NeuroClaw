@@ -49,6 +49,124 @@ This skill does not hardcode detailed install/run commands for each model. Those
 - NeuroStorm:
 	- See `run_models/models/neurostorm.md` for the current model card, citation, and execution details.
 
+## Harness-Aware Model Registration (Declarative + Testing + Drift Detection)
+
+### Model Specification Format (Extended)
+Every model integrated into run_models **must** include a **model specification file** in JSON format alongside its Markdown documentation:
+
+**File**: `run_models/models/{model_name}_spec.json`
+
+```json
+{
+  "model_name": "brain_gnn",
+  "version": "1.0.0",
+  "paper": "Li et al., 2020",
+  "code_repo": "https://github.com/xxlya/BrainGNN_Pytorch",
+  "required_dependencies": {
+    "torch": ">=1.9.0,<2.1.0",
+    "numpy": ">=1.21.0",
+    "scipy": ">=1.7.0",
+    "networkx": ">=2.6.0"
+  },
+  "input_spec": {
+    "modality": "fMRI",
+    "format": "ROI time-series (N_nodes, T_timepoints)",
+    "expected_shape": [116, null],
+    "value_range": [-5.0, 5.0],
+    "required_preprocessing": ["z-score normalization"]
+  },
+  "output_spec": {
+    "type": "classification|regression",
+    "classes": null,
+    "value_range": null
+  },
+  "validation_checksums": {
+    "weights_sha256": "abc123...",
+    "test_data_sha256": "def456..."
+  }
+}
+```
+
+### Test Suite Requirements
+Every model **must** include an automated test suite covering:
+
+1. **Input validation**: verify input dimensions, data types, value ranges
+2. **Determinism check**: seed control + verify identical outputs with same seed (tolerance: 1e-6)
+3. **Performance regression**: compare inference speed and memory usage against baseline
+4. **Output coherence**: verify outputs lie within expected value range, no NaN/Inf values
+5. **Backward compatibility**: test model against previous version checksum (if available)
+
+**Test execution**:
+```bash
+python -m pytest run_models/tests/test_{model_name}.py -v --harness-report
+```
+
+Output: `run_models_test_report_{model_name}_{timestamp}.json` with pass/fail status and metrics
+
+### Drift Detection Protocol
+Monitor production/inference results for concept drift (distribution shift in data or model behavior):
+
+**Automated monitoring per 100 inferences**:
+- **Input distribution shift** (KL divergence against reference data): flag if deviation > 0.1
+- **Output distribution shift** (prediction probability / regression output quantiles): flag if shift detected
+- **Latency drift** (average inference time): alert if >20% increase
+- **Failure rate monitoring** (predictions with NaN/Inf / out-of-range): flag if >1% failures
+
+**Logging output**: `run_models_drift_log.json` (append-only, timestamped entries)
+
+Example entry:
+```json
+{
+  "timestamp": "2026-04-05T14:32:00Z",
+  "model": "brain_gnn",
+  "inference_count": 100,
+  "input_kl_divergence": 0.045,
+  "output_mean_shift": 0.002,
+  "latency_ms": 45.2,
+  "failure_rate": 0.0,
+  "status": "healthy"
+}
+```
+
+**Alert thresholds**: 
+- KL divergence > 0.1 → generate warning
+- Output shift > 5% std dev → investigation recommended
+- Latency drift > 20% → check computational resource bottleneck
+- Failure rate > 1% → stop inference, require manual review
+
+### Model Card Template (Minimum Required Metadata)
+Each model must include a model card in `run_models/models/{model_name}.md` documenting:
+
+```markdown
+## Model Card: {model_name}
+
+### Model Details
+- **Model name**: {name}
+- **Version**: {X.Y.Z}
+- **Date**: {YYYY-MM-DD}
+- **Source repository**: {repo_url}
+- **Paper**: {citation}
+
+### Intended Use
+- **Primary use case**: [e.g., fMRI-based phenotype classification]
+- **Input modalities**: [fMRI, sMRI, etc.]
+- **Supported tasks**: [classification, regression, interpretability]
+
+### Known Limitations
+- [e.g., "Trained on N subjects aged 18-65; generalization to pediatric/geriatric populations not validated"]
+- [e.g., "Sensitive to head motion artifacts; recommend ICA-FIX preprocessing"]
+
+### Validation Results
+- **Test set performance**: [accuracy/AUC/RMSE with confidence intervals]
+- **Cross-site validation**: [performance on held-out sites, if applicable]
+- **Robustness checks**: [drift detection history, adversarial perturbation results]
+
+### Dependencies & Versioning
+- **Required libraries**: [see {model_name}_spec.json]
+- **Hash (model weights)**: {SHA256}
+- **Last verified**: {date}
+```
+
 ---
 
 ## Delegation Rules
@@ -132,5 +250,5 @@ All model-running artifacts should be managed under `./run_models_output/`:
 	- https://github.com/ZhibinHe/FM-APP
 
 Created At: 2026-03-28 20:38 HKT
-Last Updated At: 2026-03-28 20:38 HKT
+Last Updated At: 2026-04-05 02:01 HKT
 Author: chengwang96

@@ -120,6 +120,69 @@ if __name__ == "__main__":
 Official HCP Pipelines integration for NeuroClaw high-precision multimodal preprocessing.  
 Official repository: https://github.com/Washington-University/HCPpipelines
 
+## Post-Execution Verification (Harness Integration)
+
+After HCP Pipeline processing completes, this skill **automatically invokes harness-core's VerificationRunner** to validate output integrity:
+
+**Integrated verification checks**:
+
+```python
+from skills.harness_core import VerificationRunner, AuditLogger
+
+verifier = VerificationRunner(task_type="hcp_preprocessing")
+
+# 1. Structural preprocessing completion (PreFreeSurfer/FreeSurfer/PostFreeSurfer)
+verifier.add_check("structural_pipeline",
+    checker=lambda: verify_structural_outputs(output_dir),
+    severity="error"
+)
+
+# 2. Functional preprocessing (fMRIVolume/fMRISurface completion)
+verifier.add_check("functional_pipeline",
+    checker=lambda: verify_functional_outputs(output_dir),
+    severity="error"
+)
+
+# 3. Diffusion preprocessing (topup/eddy/bedpostx completion)
+verifier.add_check("diffusion_pipeline",
+    checker=lambda: verify_diffusion_outputs(output_dir),
+    severity="error"
+)
+
+# 4. Surface registration quality (MSMAll)
+verifier.add_check("surface_registration",
+    checker=lambda: verify_surface_registration_quality(output_dir),
+    severity="warning"
+)
+
+# 5. ICA-FIX denoising success (if applied)
+verifier.add_check("ica_fix_denoising",
+    checker=lambda: verify_ica_fix_completion(output_dir),
+    severity="warning"
+)
+
+# 6. Output BIDS compliance
+verifier.add_check("bids_compliance",
+    checker=lambda: verify_bids_structure(output_dir),
+    severity="warning"
+)
+
+report = verifier.run(output_dir)
+
+# Log verification results
+logger = AuditLogger(log_file=f"{output_dir}/hcp_verification.jsonl")
+logger.log_validation(
+    task_name="hcp_preprocessing",
+    checks_passed=len([r for r in report.results if r.passed]),
+    total_checks=len(report.results),
+    output_path=output_dir
+)
+```
+
+**Output**: `{output_dir}/hcp_verification.jsonl` (structured audit log with JSONL format)
+
+---
+
 Created At: 2026-03-25 19:30 HKT  
-Last Updated At: 2026-03-26 00:12 HKT  
+Last Updated At: 2026-04-05 02:03 HKT  
 Author: chengwang96

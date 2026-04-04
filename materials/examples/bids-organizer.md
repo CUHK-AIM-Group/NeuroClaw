@@ -337,7 +337,7 @@ You may use the `multi-search-engine` or `academic-research-hub` skill to find t
 ---
 Created At: 2026-03-25 16:00 HKT  
 Last Updated At: 2026-03-25 16:21 HKT  
-Author: Cheng Wang
+Author: chengwang96
 
 ## Assistant (2026-03-31T12:27:54.176Z)
 
@@ -493,7 +493,7 @@ Custom core skill designed for NeuroClaw to provide safe, tmux-based shell execu
 ---
 Created At: 2026-03-19 20:00 HKT  
 Last Updated At: 2026-03-25 16:22 HKT  
-Author: Cheng Wang
+Author: chengwang96
 
 ## Assistant (2026-03-31T12:29:11.733Z)
 

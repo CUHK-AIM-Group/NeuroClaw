@@ -299,7 +299,7 @@ pip install arxiv scholarly pubmed-parser semanticscholar requests
 ---
 Created At: 2026-03-25 18:20 HKT  
 Last Updated At: 2026-03-25 18:20 HKT  
-Author: Cheng Wang
+Author: chengwang96
 
 ## Assistant (2026-03-31T07:07:39.864Z)
 

@@ -100,10 +100,72 @@ def organize_to_bids(raw_dir, bids_dir, subject_id, session_id="01"):
 - Preparing data for `fmriprep-tool`, `hcppipeline-tool`, `fsl-tool`, or `fmri-skill`
 - Before running any standardized preprocessing pipeline
 
+## Post-Execution Verification (Harness Integration)
+
+After BIDS organization completes, this skill **automatically invokes harness-core's VerificationRunner** to validate output integrity:
+
+**Integrated verification checks**:
+
+```python
+from skills.harness_core import VerificationRunner, AuditLogger
+
+verifier = VerificationRunner(task_type="bids_organization")
+
+# 1. BIDS structure compliance
+verifier.add_check("bids_structure", 
+    checker=lambda: verify_bids_structure(bids_dir),
+    severity="error"
+)
+
+# 2. Dataset description file
+verifier.add_check("dataset_description",
+    checker=lambda: verify_dataset_description_exists(bids_dir),
+    severity="error"
+)
+
+# 3. Subject/session naming convention
+verifier.add_check("naming_convention",
+    checker=lambda: verify_bids_naming(bids_dir),
+    severity="error"
+)
+
+# 4. Metadata JSON sidecar completeness
+verifier.add_check("json_sidecars",
+    checker=lambda: verify_json_sidecars(bids_dir),
+    severity="warning"
+)
+
+# 5. Required BIDS files presence
+verifier.add_check("required_files",
+    checker=lambda: verify_required_files(bids_dir),
+    severity="error"
+)
+
+report = verifier.run(bids_dir)
+
+# Log verification results
+logger = AuditLogger(log_file=f"{bids_dir}/bids_verification.jsonl")
+logger.log_validation(
+    task_name="bids_organization",
+    checks_passed=len([r for r in report.results if r.passed]),
+    checks_failed=len([r for r in report.results if not r.passed]),
+    warnings=len([r for r in report.results if r.severity == "warning" and not r.passed]),
+    report_summary=report.to_dict()
+)
+
+if report.failed:
+    raise ValueError(f"BIDS verification failed: {report.summary}")
+```
+
+**Output files generated**:
+- `{bids_dir}/bids_verification.jsonl` — structured audit log
+- `{bids_dir}/.bids_validation_timestamp` — verification completion marker
+
 ## Complementary / Related Skills
 
 - `dependency-planner` → install required tools
 - `claw-shell` → safe execution of all commands
+- `harness-core` → automated verification and audit logging
 
 ## More Advanced Features
 
@@ -116,5 +178,5 @@ You may use the `multi-search-engine` or `academic-research-hub` skill to find t
 
 ---
 Created At: 2026-03-25 16:00 HKT  
-Last Updated At: 2026-03-25 16:21 HKT  
-Author: Cheng Wang
+Last Updated At: 2026-04-05 02:01 HKT
+Author: chengwang96
