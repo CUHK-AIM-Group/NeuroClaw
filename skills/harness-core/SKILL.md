@@ -410,15 +410,6 @@ class CustomVerifier(VerificationRunner):
 
 ---
 
-## Reference & Further Reading
-
-- Architecture: NeuroClaw Harness Engineering Principles (SOUL.md)
-- Recommended reading: CVPR 2026 Rebuttal (materials/CVPR_2026/rebuttal.tex) for foundational concepts
-- Related skills: experiment-controller, run_models, fmri-skill, smri-skill
-
----
-
 Created At: 2026-04-05 01:48 HKT  
 Last Updated At: 2026-04-05 02:01 HKT
 Author: chengwang96
-c

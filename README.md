@@ -24,23 +24,17 @@ Neuroimaging datasets demand specialized preprocessing, and preprocessing qualit
 NeuroClaw prioritizes **data processing** and **model configuration/execution**. It remains an end-to-end Claw system, but for neuroscience its center of gravity is data and models.
 
 **Notes**
-- We manually test each skill in materials/examples and store the chat logs there. If you run into issues, check the examples first.
+- We constructed **NeuroBench** to benchmark multi-agent performance across neuroimaging workflows, especially raw data processing and model execution, and plan to refine and evaluate existing medical and general claw systems.
 - Each SKILL.md ends with the author information; please open an issue to the corresponding author if you have questions.
 
 
-![NeuroClaw Overview](materials/main.png)
+## 🚀 Updates
+
+- **[2026.04.06]**: We begin constructing NeuroBench for multi-agent framework evaluation.
+- **[2026.04.02]**: v0.1 released with complete NeuroClaw framework and core functionality.
 
 <a id="key-features"></a>
 ## ✨ Key Features
-
-### 🧠 End-to-End Research Coverage
-- **Literature Review**: arXiv search, PubMed retrieval, academic resource integration
-- **Experiment Design**: Scientific literature analysis, methodology evaluation, research proposal generation
-- **Data Processing**: Multi-format conversion (DICOM ↔ NIfTI), automated preprocessing pipelines
-- **Model Execution**: Run published research models, deep learning framework integration
-- **Result Visualization**: Scientific data visualization, statistical chart generation
-- **Paper Writing**: Auto-generated drafts, format standardization
-
 ### 🔄 Dataset-First Architecture
 Organize capabilities around "which dataset to process" instead of "which tool to call":
 - **ADNI Dataset** → Integrated ADNI standardized processing pipeline
@@ -55,12 +49,13 @@ Users simply specify the target dataset, and the system automatically recommends
 - **Environment Isolation**: Virtual environments and containerization avoid system pollution
 - **Verifiable Processes**: Complete logging and result tracking
 
-### 🔐 Harness Engineering
-- **Self-Verification**: Built-in validation checks for all skill outputs (BIDS compliance, data integrity, statistical bounds, artifact quality)
-- **Reproducible Logging**: Timestamped JSONL audit trails with SHA256 hashing and PII scrubbing for full experiment traceability
-- **Checkpointing & Recovery**: Automatic phase checkpoints with LZ4 compression; resume interrupted tasks from last verified state
-- **Drift Detection**: Continuous monitoring for data/model distribution shifts (KL divergence, latency, failure rate) with configurable thresholds
-- **Environment Reproducibility**: Automatic capture and verification of Python versions, package dependencies, CUDA, and system configurations
+### 🧠 End-to-End Research Coverage
+- **Literature Review**: arXiv search, PubMed retrieval, academic resource integration
+- **Experiment Design**: Scientific literature analysis, methodology evaluation, research proposal generation
+- **Data Processing**: Multi-format conversion (DICOM ↔ NIfTI), automated preprocessing pipelines
+- **Model Execution**: Run published research models, deep learning framework integration
+- **Result Visualization**: Scientific data visualization, statistical chart generation
+- **Paper Writing**: Auto-generated drafts, format standardization
 
 ### 🤝 OpenClaw Compatibility
 - Fully compatible with [OpenClaw](https://github.com/openclaw/openclaw) framework, can be installed directly into existing OpenClaw environments
@@ -118,6 +113,7 @@ NeuroClaw/
 │   ├── academic-research-hub/
 │   ├── adni-skill/
 │   ├── bids-organizer/
+│   ├── beautiful-log/
 │   ├── claw-shell/
 │   ├── conda-env-manager/
 │   ├── conn-tool/
@@ -178,6 +174,7 @@ NeuroClaw/
 | `overleaf-skill` | Overleaf sync and collaborative manuscript operations | ✅ |
 | `academic-research-hub` | Multi-source academic search and paper retrieval | ✅ |
 | `bids-organizer` | Base skill for organizing raw data into BIDS structure | ✅ |
+| `beautiful-log` | Export clean User/NeuroClaw dialogue into beautiful HTML logs | ✅ |
 | `harness-core` | Harness engineering SDK (verification, checkpointing, audit logging, drift detection) | ✅ |
 
 ### Interface Layer (Task Orchestration)
