@@ -25,7 +25,7 @@ Required input files:
 
 If required input is missing, return:
 
-- `任务缺少输入`
+- `Missing required input`
 
 ## Output
 
@@ -42,10 +42,10 @@ At least one FC matrix file must be generated. Recommended file names:
 
 ## Success Criteria
 
-✓ FC result file is generated under `benchmark_results/T04_conn_tool/`
-✓ FC matrix is 2D and square (N x N)
-✓ N is reasonable for atlas-based FC (N >= 10)
-✓ Matrix values are numeric and finite
+- FC result file is generated under `benchmark_results/T04_conn_tool/`
+- FC matrix is 2D and square (N x N)
+- N is reasonable for atlas-based FC (N >= 10)
+- Matrix values are numeric and finite
 
 ## Verification Suggestion
 

@@ -8,7 +8,7 @@ Please store the **T1** and **fMRI** data in `./hcp-subset` using the **BIDS** f
 
 - Required input folder: `./hcp-subset`
 - If `./hcp-subset` does not exist, return:
-  - `任务缺少输入`
+  - `Missing required input`
 
 ## Constraints
 
@@ -42,9 +42,9 @@ You must use shell commands to verify directory structure and file extensions by
 
 ## Success Criteria
 
-✓ `./hcp-subset` exists
-✓ Contains at least one BIDS subject folder: `sub-*`
-✓ Each detected subject has valid `anat` T1w file pair (`.nii/.nii.gz` + `.json`)
-✓ Each detected subject has valid `func` BOLD file pair (`.nii/.nii.gz` + `.json`)
-✓ File names match BIDS modality suffixes (`_T1w`, `_bold`)
-✓ `dataset_description.json` exists
+- `./hcp-subset` exists
+- Contains at least one BIDS subject folder: `sub-*`
+- Each detected subject has valid `anat` T1w file pair (`.nii/.nii.gz` + `.json`)
+- Each detected subject has valid `func` BOLD file pair (`.nii/.nii.gz` + `.json`)
+- File names match BIDS modality suffixes (`_T1w`, `_bold`)
+- `dataset_description.json` exists

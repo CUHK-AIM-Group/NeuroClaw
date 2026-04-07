@@ -267,7 +267,7 @@ if report.failed:
 ---
 
 ## Reference & Source
-Aligned with NeuroClaw modality-skill pattern (see `fmri-skill`, `dti-skill`, `eeg-skill`).
+Aligned with NeuroClaw modality-skill pattern (see `fmri-skill`, `dwi-skill`, `eeg-skill`).
 Common sMRI toolchain: FSL (fast structural utilities), FreeSurfer (surface morphometry), HCP pipelines (HCP-grade structural processing), fMRIPrep (BIDS anatomical derivatives), Nilearn (ROI features on NIfTI maps), MARS-WMH (WMH segmentation via Docker).
 
 Created At: 2026-03-26 1:09 HKT

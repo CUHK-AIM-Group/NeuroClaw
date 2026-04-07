@@ -9,7 +9,7 @@ license: MIT License (NeuroClaw custom skill – freely modifiable within the pr
 ## Overview
 `dipy-tool` is the **NeuroClaw base/tool skill** that provides the concrete **DIPY** implementation for diffusion MRI (DWI/DTI) processing and feature extraction.
 
-It is **never called directly by the user**. It is delegated to by a diffusion modality-layer skill (e.g., future `dti-skill` / `dmri-skill`) and executed via `claw-shell` for safety, logging, and long-running stability.
+It is **never called directly by the user**. It is delegated to by a diffusion modality-layer skill (e.g., future `dwi-skill` / `dmri-skill`) and executed via `claw-shell` for safety, logging, and long-running stability.
 
 This skill provides:
 - Robust loading of **DWI NIfTI + bvals + bvecs** with sanity checks.

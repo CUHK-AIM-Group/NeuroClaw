@@ -39,12 +39,12 @@ Results should be saved to `benchmark_results/T01_academic_search/` as a JSON fi
 ```
 
 ### Success Criteria
-✓ Successfully retrieves 30 papers (or maximum available) from each platform
-✓ Papers are sorted by publication date (newest first)
-✓ Results are saved in JSON format with proper keys
-✓ Output file is timestamped and placed in `benchmark_results/T01_academic_search/`
-✓ **All papers must have publication dates within 180 days of the search date**
-✓ No errors or missing dependencies
+- Successfully retrieves 30 papers (or maximum available) from each platform
+- Papers are sorted by publication date (newest first)
+- Results are saved in JSON format with proper keys
+- Output file is timestamped and placed in `benchmark_results/T01_academic_search/`
+- **All papers must have publication dates within 180 days of the search date**
+- No errors or missing dependencies
 
 ### Implementation Details
 

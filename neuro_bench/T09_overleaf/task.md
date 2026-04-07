@@ -21,7 +21,7 @@ Required inputs:
 
 If `./cvpr_paper` does not exist, return:
 
-- `任务缺少输入`
+- `Missing required input`
 
 If cookie is missing/invalid, return a clear authentication error and exit.
 

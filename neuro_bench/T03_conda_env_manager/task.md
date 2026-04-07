@@ -45,10 +45,10 @@ Recommended structure:
 
 ## Success Criteria
 
-✓ A new conda env is created successfully
-✓ `htop` is installed in that env
-✓ `htop --version` runs successfully in that env
-✓ Result JSON is written to `benchmark_results/T03_conda_env_manager/`
+- A new conda env is created successfully
+- `htop` is installed in that env
+- `htop --version` runs successfully in that env
+- Result JSON is written to `benchmark_results/T03_conda_env_manager/`
 
 ## Verification Suggestion
 

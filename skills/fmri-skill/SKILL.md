@@ -318,7 +318,7 @@ fmri_output/
 
 ## Reference & Source
 
-Aligned with NeuroClaw modality-skill pattern (see `smri-skill`, `eeg-skill`, `dti-skill`).  
+Aligned with NeuroClaw modality-skill pattern (see `smri-skill`, `eeg-skill`, `dwi-skill`).  
 **Validated pipeline**: ADNI resting-state fMRI processing workflow (fMRIPrep 23.x + XCP-D).  
 Core tools used:
 - `fmriprep-tool` (v23.2.1+): Motion correction, coregistration, FreeSurfer wrapper

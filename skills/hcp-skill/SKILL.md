@@ -12,7 +12,7 @@ license: MIT License (NeuroClaw custom skill - freely modifiable within the proj
 It coordinates a fixed three-phase workflow:
 1. Download HCP data using NeuroSTORM download scripts.
 2. Prepare/validate data organization for downstream processing.
-3. Delegate modality pipelines to `smri-skill`, `fmri-skill`, and `dti-skill`.
+3. Delegate modality pipelines to `smri-skill`, `fmri-skill`, and `dwi-skill`.
 
 This skill follows NeuroClaw hierarchy:
 - Defines **WHAT to do**, not low-level implementation details.
@@ -31,7 +31,7 @@ This skill follows NeuroClaw hierarchy:
 5. After download success, delegate sequentially or in parallel to:
 	 - `smri-skill` for structural MRI
 	 - `fmri-skill` for functional MRI
-	 - `dti-skill` for diffusion MRI
+	 - `dwi-skill` for diffusion MRI
 6. Save outputs into an HCP-centered structure under `hcp_output/`.
 
 ---
@@ -70,7 +70,7 @@ After download completes, `hcp-skill` delegates by modality:
 |---|---|---|---|
 | sMRI (T1w/T2w) | `smri-skill` | brain extraction, tissue segmentation, cortical reconstruction, ROI morphometry | `smri_output/` derivatives and stats |
 | fMRI (rfMRI/tfMRI) | `fmri-skill` | preprocessing, denoising, ROI time series, connectivity | `fmri_output/` derivatives, timeseries, connectivity |
-| DTI/DWI | `dti-skill` | diffusion preprocessing, tensor metrics, tractography/connectome | `dwi_output/` or `dti_output/` metrics and tract files |
+| DTI/DWI | `dwi-skill` | diffusion preprocessing, tensor metrics, tractography/connectome | `dwi_output/` or `dti_output/` metrics and tract files |
 
 ### Delegation Strategy
 - If user asks for full multimodal HCP analysis: run sMRI -> fMRI -> DTI in ordered phases.
@@ -102,7 +102,7 @@ All assets should be organized under `./hcp_output/`:
 - HCP multimodal processing is resource intensive (CPU, RAM, and storage).
 - Download stage may require stable network and credential renewal.
 - HCP directory conventions can vary by subset; always validate expected files before starting modality pipelines.
-- `hcp-skill` is orchestration-only; detailed preprocessing logic remains in `smri-skill`, `fmri-skill`, and `dti-skill`.
+- `hcp-skill` is orchestration-only; detailed preprocessing logic remains in `smri-skill`, `fmri-skill`, and `dwi-skill`.
 - For highest-fidelity HCP-native preprocessing, optionally delegate to `hcppipeline-tool` as an alternative route.
 
 ---
@@ -117,7 +117,7 @@ All assets should be organized under `./hcp_output/`:
 ## Complementary / Related Skills
 - `smri-skill`
 - `fmri-skill`
-- `dti-skill`
+- `dwi-skill`
 - `hcppipeline-tool`
 - `bids-organizer`
 - `dependency-planner`

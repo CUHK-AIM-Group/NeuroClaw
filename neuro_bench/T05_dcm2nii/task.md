@@ -12,7 +12,7 @@ Required input folder:
 
 If `./201` does not exist or contains no DICOM files, return:
 
-- `任务缺少输入`
+- `Missing required input`
 
 ## Constraints
 
@@ -34,9 +34,9 @@ Optional sidecar metadata files are allowed:
 
 ## Success Criteria
 
-✓ Input folder `./201` exists and contains DICOM files
-✓ At least one valid NIfTI file is generated under `benchmark_results/T05_dcm2nii/`
-✓ Generated NIfTI is consistent with source DICOM metadata (dimension/spacing level)
+- Input folder `./201` exists and contains DICOM files
+- At least one valid NIfTI file is generated under `benchmark_results/T05_dcm2nii/`
+- Generated NIfTI is consistent with source DICOM metadata (dimension/spacing level)
 
 ## Verification Suggestion
 

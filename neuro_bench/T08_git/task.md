@@ -58,9 +58,9 @@ Recommended structure:
 
 ## Success Criteria
 
-✓ Result JSON exists in `benchmark_results/T08_git/`
-✓ Grader can clone/pull the target repository
-✓ Repository `README.md` content is exactly `NeuroBench Task 8`
+- Result JSON exists in `benchmark_results/T08_git/`
+- Grader can clone/pull the target repository
+- Repository `README.md` content is exactly `NeuroBench Task 8`
 
 ## Verification Suggestion
 

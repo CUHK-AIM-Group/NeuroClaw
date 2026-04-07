@@ -52,11 +52,11 @@ Recommended structure:
 
 ## Success Criteria
 
-✓ A new conda env is created successfully
-✓ PyTorch can be imported in the new env
-✓ Basic tensor compute smoke test passes
-✓ If GPU is present on host, PyTorch can access GPU (`torch.cuda.is_available() == True`)
-✓ Result JSON is written to `benchmark_results/T06_dependency_planner/`
+- A new conda env is created successfully
+- PyTorch can be imported in the new env
+- Basic tensor compute smoke test passes
+- If GPU is present on host, PyTorch can access GPU (`torch.cuda.is_available() == True`)
+- Result JSON is written to `benchmark_results/T06_dependency_planner/`
 
 ## Verification Suggestion
 

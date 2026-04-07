@@ -44,10 +44,10 @@ Markdown or text is also acceptable if it contains a clear recipe title, ingredi
 
 ## Success Criteria
 
-✓ Output file exists in `benchmark_results/T07_multi_search_engine/`
-✓ A spicy chicken recipe is generated
-✓ Recipe contains explicit cooking steps (at least 3 steps)
-✓ Steps are in an ordered format (numbered list or structured step array)
+- Output file exists in `benchmark_results/T07_multi_search_engine/`
+- A spicy chicken recipe is generated
+- Recipe contains explicit cooking steps (at least 3 steps)
+- Steps are in an ordered format (numbered list or structured step array)
 
 ## Verification Suggestion
 
@@ -55,4 +55,4 @@ Use commands to self-check outputs, for example:
 
 - `find benchmark_results/T07_multi_search_engine -type f | sort`
 - `cat benchmark_results/T07_multi_search_engine/result_*.json`
-- `grep -n "step\|步骤\|1\.\|2\." benchmark_results/T07_multi_search_engine/*`
+- `grep -n "step\|steps\|1\.\|2\." benchmark_results/T07_multi_search_engine/*`
