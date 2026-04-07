@@ -57,8 +57,8 @@ def _ask(prompt: str, default: str = "") -> str:
 def _ask_yn(prompt: str, default: bool = True) -> bool:
     hint = "Y/n" if default else "y/N"
     raw = _ask(f"{prompt} [{hint}]", "").lower()
-    if raw in ("", "y", "yes"):
-        return True if (raw in ("y", "yes") or default) else False
+    if not raw:
+        return default
     return raw in ("y", "yes")
 
 
@@ -221,7 +221,8 @@ def _setup_cuda(snap: dict) -> dict:
         "11.8": "cu118", "11.7": "cu117",
     }
     major_minor = ".".join(cuda_version.split(".")[:2])
-    default_build = _cuda_map.get(major_minor, f"cu{''.join(major_minor.split('.'))}")
+    # Build the PyTorch CUDA tag: e.g. "12.1" → "cu121", "11.8" → "cu118"
+    default_build = _cuda_map.get(major_minor, "cu" + major_minor.replace(".", ""))
     torch_build = _ask("PyTorch CUDA build tag", default_build)
 
     # Detect GPU device
@@ -236,13 +237,12 @@ def _setup_cuda(snap: dict) -> dict:
 
     cuda_cfg: dict = {"version": cuda_version, "torch_build": torch_build, "device": device}
 
-    # Offer to install PyTorch
+    # Offer to install PyTorch using the user-selected Python environment
     if _ask_yn("Install torch + torchvision automatically?"):
         py_path = snap.get("_python_path", sys.executable)
-        channel = f"pytorch-{torch_build}"
         cmd = [
             py_path, "-m", "pip", "install",
-            f"torch", f"torchvision", f"torchaudio",
+            "torch", "torchvision", "torchaudio",
             "--index-url", f"https://download.pytorch.org/whl/{torch_build}",
         ]
         _log(f"Installing PyTorch ({torch_build}) …")
@@ -256,9 +256,8 @@ def _setup_cuda(snap: dict) -> dict:
 
     return cuda_cfg
 
-
 # ── Step 4: Neuroscience toolchain ─────────────────────────────────────────────
-def _setup_toolchain() -> dict:
+def _setup_toolchain(snap: dict) -> tuple[dict, dict]:
     print("\n" + "=" * 60)
     print("[NeuroClaw Setup] Step 3 — Neuroscience Toolchain")
     print("=" * 60)
@@ -291,18 +290,18 @@ def _setup_toolchain() -> dict:
     else:
         features["freesurfer"] = False
 
-    # MNE-Python
+    # MNE-Python — install into the user-selected Python environment
     if _ask_yn("Install MNE-Python (pip install mne)?"):
-        python_path = shutil.which("python3") or sys.executable
+        python_path = snap.get("_python_path", sys.executable)
         subprocess.run([python_path, "-m", "pip", "install", "mne"], check=False)
         features["mne"] = True
         _log("MNE-Python: installed")
     else:
         features["mne"] = False
 
-    # nibabel / nilearn / dipy
+    # nibabel / nilearn / dipy — install into the user-selected Python environment
     if _ask_yn("Install nibabel, nilearn, dipy?"):
-        python_path = shutil.which("python3") or sys.executable
+        python_path = snap.get("_python_path", sys.executable)
         subprocess.run(
             [python_path, "-m", "pip", "install", "nibabel", "nilearn", "dipy"],
             check=False,
@@ -364,11 +363,16 @@ def _setup_llm() -> dict:
         llm["provider"] = "anthropic"
         llm["model"] = _ask("Model name", "claude-3-5-sonnet-20241022")
         llm["api_key_env"] = "ANTHROPIC_API_KEY"
-        key = _ask("API key (stored as env var name, not value — or press Enter to skip)")
-        if key and not key.startswith("ANTHROPIC"):
-            # User pasted the actual key — store it
+        key = _ask("Paste API key to set it now (or press Enter to set it later via env var)")
+        # Anthropic keys begin with "sk-ant-"; accept any non-empty input that looks like a key
+        if key and key.startswith("sk-ant-"):
             os.environ["ANTHROPIC_API_KEY"] = key
             _log("Anthropic API key stored in environment (not persisted to disk).")
+        elif key:
+            _log(
+                "Input does not look like an Anthropic API key (expected 'sk-ant-...'). "
+                "Set ANTHROPIC_API_KEY manually before starting NeuroClaw."
+            )
         _log(f"LLM: Anthropic {llm['model']}")
 
     elif choice == "3":
@@ -382,10 +386,16 @@ def _setup_llm() -> dict:
         llm["provider"] = "openai"
         llm["model"] = _ask("Model name", "gpt-4o")
         llm["api_key_env"] = "OPENAI_API_KEY"
-        key = _ask("API key (press Enter to skip if already in env)")
-        if key and not key.startswith("OPENAI"):
+        key = _ask("Paste API key to set it now (or press Enter to set it later via env var)")
+        # OpenAI keys begin with "sk-"
+        if key and key.startswith("sk-"):
             os.environ["OPENAI_API_KEY"] = key
             _log("OpenAI API key stored in environment (not persisted to disk).")
+        elif key:
+            _log(
+                "Input does not look like an OpenAI API key (expected 'sk-...'). "
+                "Set OPENAI_API_KEY manually before starting NeuroClaw."
+            )
         _log(f"LLM: OpenAI {llm['model']}")
 
     return llm
@@ -453,7 +463,7 @@ def main() -> None:
     snap["_python_path"] = python_cfg.get("python_path") or sys.executable
 
     cuda_cfg = _setup_cuda(snap)
-    toolchain_cfg, toolchain_features = _setup_toolchain()
+    toolchain_cfg, toolchain_features = _setup_toolchain(snap)
     llm_cfg = _setup_llm()
     neuro_cfg = _setup_neuro_defaults()
 

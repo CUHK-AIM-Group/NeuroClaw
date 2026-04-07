@@ -53,7 +53,8 @@ def _check_existing_config() -> int:
     # Python path
     python_path = config.get("python_path")
     if python_path and not Path(python_path).exists():
-        issues.append(f"python_path not found: {python_path}")
+        py_path_display = str(python_path)
+        issues.append(f"python_path not found: {py_path_display}")
 
     # LLM backend key env var
     llm = config.get("llm_backend", {})

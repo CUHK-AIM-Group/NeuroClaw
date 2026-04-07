@@ -91,9 +91,7 @@ class ToolRuntime:
         )
         try:
             proc = subprocess.run(
-                [node, "--input-type=module", "-e", wrapper]
-                if False  # ES module shim disabled for compat
-                else [node, "-e", wrapper],
+                [node, "-e", wrapper],
                 input=json.dumps(input_data),
                 capture_output=True,
                 text=True,
@@ -124,8 +122,14 @@ class ToolRuntime:
             "fn = [v for v in vars(mod).values() if callable(v) and not v.__name__.startswith('_')][0]\n"
             "result = fn(input_data)\n"
             "import asyncio\n"
+            # Use get_event_loop().run_until_complete to handle async handlers safely
+            # even when running inside environments that already have an event loop.
             "if asyncio.iscoroutine(result):\n"
-            "    result = asyncio.run(result)\n"  # Wrap coroutines
+            "    try:\n"
+            "        loop = asyncio.get_event_loop()\n"
+            "        result = loop.run_until_complete(result)\n"
+            "    except RuntimeError:\n"
+            "        result = asyncio.run(result)\n"
             "print(json.dumps(result))\n"
         )
         try:
