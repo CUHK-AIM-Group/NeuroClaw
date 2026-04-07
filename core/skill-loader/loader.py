@@ -68,7 +68,9 @@ class SkillLoader:
 
             # Locate handler file
             handler: Path | None = None
-            for candidate in ("handler.js", "handler.py", "handler.ts"):
+            # handler.ts is intentionally excluded: TypeScript requires compilation
+            # before execution and is not directly runnable by Node.js without a build step.
+            for candidate in ("handler.js", "handler.py"):
                 h = skill_dir / candidate
                 if h.exists():
                     handler = h

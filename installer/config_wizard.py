@@ -198,7 +198,16 @@ def _setup_python(snap: dict) -> dict:
 
 
 # ── Step 3: CUDA / GPU ─────────────────────────────────────────────────────────
-def _setup_cuda(snap: dict) -> dict:
+def _setup_cuda(snap: dict, python_path: str) -> dict:
+    """
+    Parameters
+    ----------
+    snap : dict
+        System snapshot from _system_snapshot().
+    python_path : str
+        Full path to the Python executable chosen in _setup_python(); used
+        for any automatic PyTorch installation.
+    """
     print("\n" + "=" * 60)
     print("[NeuroClaw Setup] Step 2 — CUDA / GPU Settings")
     print("=" * 60)
@@ -239,9 +248,8 @@ def _setup_cuda(snap: dict) -> dict:
 
     # Offer to install PyTorch using the user-selected Python environment
     if _ask_yn("Install torch + torchvision automatically?"):
-        py_path = snap.get("_python_path", sys.executable)
         cmd = [
-            py_path, "-m", "pip", "install",
+            python_path, "-m", "pip", "install",
             "torch", "torchvision", "torchaudio",
             "--index-url", f"https://download.pytorch.org/whl/{torch_build}",
         ]
@@ -257,7 +265,24 @@ def _setup_cuda(snap: dict) -> dict:
     return cuda_cfg
 
 # ── Step 4: Neuroscience toolchain ─────────────────────────────────────────────
-def _setup_toolchain(snap: dict) -> tuple[dict, dict]:
+def _setup_toolchain(snap: dict, python_path: str) -> tuple[dict, dict]:
+    """
+    Parameters
+    ----------
+    snap : dict
+        System snapshot (reserved for future use).
+    python_path : str
+        Full path to the Python executable chosen in _setup_python(); used
+        for pip install commands (MNE, nibabel, etc.) so packages land in
+        the correct environment rather than a random system python3.
+
+    Returns
+    -------
+    toolchain : dict
+        Paths for FSL, FreeSurfer, dcm2niix, MATLAB.
+    features : dict
+        Boolean feature-enable flags for core/config/features.json.
+    """
     print("\n" + "=" * 60)
     print("[NeuroClaw Setup] Step 3 — Neuroscience Toolchain")
     print("=" * 60)
@@ -292,7 +317,6 @@ def _setup_toolchain(snap: dict) -> tuple[dict, dict]:
 
     # MNE-Python — install into the user-selected Python environment
     if _ask_yn("Install MNE-Python (pip install mne)?"):
-        python_path = snap.get("_python_path", sys.executable)
         subprocess.run([python_path, "-m", "pip", "install", "mne"], check=False)
         features["mne"] = True
         _log("MNE-Python: installed")
@@ -301,7 +325,6 @@ def _setup_toolchain(snap: dict) -> tuple[dict, dict]:
 
     # nibabel / nilearn / dipy — install into the user-selected Python environment
     if _ask_yn("Install nibabel, nilearn, dipy?"):
-        python_path = snap.get("_python_path", sys.executable)
         subprocess.run(
             [python_path, "-m", "pip", "install", "nibabel", "nilearn", "dipy"],
             check=False,
@@ -460,16 +483,17 @@ def main() -> None:
     snap = _system_snapshot()
 
     python_cfg = _setup_python(snap)
-    snap["_python_path"] = python_cfg.get("python_path") or sys.executable
+    # Resolve the selected Python executable; used by later steps for pip installs
+    selected_python = python_cfg.get("python_path") or sys.executable
 
-    cuda_cfg = _setup_cuda(snap)
-    toolchain_cfg, toolchain_features = _setup_toolchain(snap)
+    cuda_cfg = _setup_cuda(snap, python_path=selected_python)
+    toolchain_cfg, toolchain_features = _setup_toolchain(snap, python_path=selected_python)
     llm_cfg = _setup_llm()
     neuro_cfg = _setup_neuro_defaults()
 
     config = {
         "setup_type": python_cfg["setup_type"],
-        "python_path": python_cfg["python_path"],
+        "python_path": selected_python,
         "conda_env": python_cfg.get("conda_env"),
         "docker_config": python_cfg.get("docker_config"),
         "cuda": cuda_cfg,
