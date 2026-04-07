@@ -173,7 +173,18 @@ class AgentSession:
         self.workspace = workspace or REPO_ROOT
         self.env = load_environment()
         self.history: list[dict] = []
-        self._llm = None
+        self._llm: Any = None
+
+    # ── Public API for external callers (e.g. the web server) ──────────────────
+
+    def set_llm_client(self, client: Any) -> None:
+        """
+        Attach an already-constructed LLM client to this session.
+
+        Prefer calling this over accessing ``self._llm`` directly so that
+        the internal field can be renamed without breaking callers.
+        """
+        self._llm = client
 
     def start(self) -> None:
         """Interactive REPL — called by main.py."""
@@ -181,7 +192,20 @@ class AgentSession:
             self._prompt_setup()
             return
 
-        from core.skill_loader.loader import SkillLoader  # type: ignore
+        import importlib.util as _ilu
+
+        # SkillLoader lives in core/skill-loader/ (hyphen) so we must use
+        # importlib rather than a regular package import.
+        _loader_mod = _ilu.spec_from_file_location(
+            "neuroclaw_skill_loader",
+            REPO_ROOT / "core" / "skill-loader" / "loader.py",
+        )
+        if _loader_mod is None or _loader_mod.loader is None:
+            raise RuntimeError("Cannot find core/skill-loader/loader.py")
+        _m = __import__("importlib").util.module_from_spec(_loader_mod)
+        _loader_mod.loader.exec_module(_m)
+        SkillLoader = _m.SkillLoader
+
         from core.session.manager import SessionManager  # type: ignore
 
         loader = SkillLoader(self.workspace / "skills")

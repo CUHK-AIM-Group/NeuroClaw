@@ -235,7 +235,7 @@ def create_app() -> Any:
         # Initialise LLM client; continue even if this fails so the error is
         # surfaced to the user in the chat window rather than crashing the server.
         try:
-            session._llm = build_llm_client(session.env)
+            session.set_llm_client(build_llm_client(session.env))
         except Exception as exc:
             await websocket.send_text(json.dumps({
                 "type": "error",

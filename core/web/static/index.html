@@ -654,14 +654,24 @@
         '<div style="padding:14px 16px;color:var(--text-muted);font-size:12px;">No skills loaded</div>';
       return;
     }
+    // Use data attributes + event delegation — never put skill names in onclick
+    // attributes, as that would allow XSS if a skill name contained JS characters.
     skillListEl.innerHTML = skills.map(s => `
       <div class="skill-item" title="${esc(s.description || '')}"
-           onclick="prefillSkill('${esc(s.name)}')">
+           data-skill-name="${esc(s.name)}">
         <div class="skill-name">${esc(s.name)}</div>
         <div class="skill-desc">${esc((s.description || '').split('.')[0])}</div>
       </div>
     `).join('');
   }
+
+  // Single event listener on the container handles all skill-item clicks
+  skillListEl.addEventListener('click', (e) => {
+    const item = e.target.closest('.skill-item');
+    if (!item) return;
+    const skillName = item.dataset.skillName;
+    if (skillName) prefillSkill(skillName);
+  });
 
   // Escape for use inside HTML attribute strings
   function esc(str) {

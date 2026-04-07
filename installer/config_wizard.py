@@ -230,8 +230,16 @@ def _setup_cuda(snap: dict, python_path: str) -> dict:
         "11.8": "cu118", "11.7": "cu117",
     }
     major_minor = ".".join(cuda_version.split(".")[:2])
-    # Build the PyTorch CUDA tag: e.g. "12.1" → "cu121", "11.8" → "cu118"
-    default_build = _cuda_map.get(major_minor, "cu" + major_minor.replace(".", ""))
+    if major_minor in _cuda_map:
+        default_build = _cuda_map[major_minor]
+    else:
+        # Version not in the known map — construct a best-guess tag and warn
+        default_build = "cu" + major_minor.replace(".", "")
+        _log(
+            f"WARNING: CUDA {major_minor} is not in the known PyTorch build map "
+            f"({', '.join(_cuda_map.keys())}). Using best-guess tag '{default_build}'. "
+            "Verify at https://pytorch.org/get-started/locally/ and adjust if needed."
+        )
     torch_build = _ask("PyTorch CUDA build tag", default_build)
 
     # Detect GPU device

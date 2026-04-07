@@ -122,14 +122,10 @@ class ToolRuntime:
             "fn = [v for v in vars(mod).values() if callable(v) and not v.__name__.startswith('_')][0]\n"
             "result = fn(input_data)\n"
             "import asyncio\n"
-            # Use get_event_loop().run_until_complete to handle async handlers safely
-            # even when running inside environments that already have an event loop.
+            # Handler runs in a fresh subprocess, so there is never an
+            # already-running event loop.  asyncio.run() is always correct here.
             "if asyncio.iscoroutine(result):\n"
-            "    try:\n"
-            "        loop = asyncio.get_event_loop()\n"
-            "        result = loop.run_until_complete(result)\n"
-            "    except RuntimeError:\n"
-            "        result = asyncio.run(result)\n"
+            "    result = asyncio.run(result)\n"
             "print(json.dumps(result))\n"
         )
         try:
