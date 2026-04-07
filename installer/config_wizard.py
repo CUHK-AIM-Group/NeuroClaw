@@ -440,6 +440,56 @@ def _setup_neuro_defaults() -> dict:
     return {"bids_root": bids_root, "output_root": output_root, "n_jobs": n_jobs}
 
 
+# ── Step 7: Web UI dependencies ────────────────────────────────────────────────
+def _setup_webui(python_path: str) -> None:
+    """
+    Optionally install fastapi + uvicorn so the browser-based Web UI works.
+
+    Parameters
+    ----------
+    python_path : str
+        Full path to the Python executable to install packages into.
+    """
+    print("\n" + "=" * 60)
+    print("[NeuroClaw Setup] Step 6 — Browser Web UI (optional)")
+    print("=" * 60)
+    print(
+        "  NeuroClaw can serve a browser-based chat interface at\n"
+        "  http://localhost:7080  (start with: python core/agent/main.py --web)\n"
+    )
+
+    # Check if fastapi and uvicorn are already available
+    _have_fastapi = bool(shutil.which("uvicorn")) or _check_importable(python_path, "fastapi")
+    if _have_fastapi:
+        _log("Web UI dependencies (fastapi, uvicorn) already installed — skipping.")
+        return
+
+    if not _ask_yn("Install Web UI dependencies (fastapi + uvicorn)?", default=True):
+        _log("Skipped Web UI dependencies. Run  pip install 'fastapi[standard]' uvicorn  to install later.")
+        return
+
+    cmd = [python_path, "-m", "pip", "install", "fastapi[standard]", "uvicorn"]
+    _log("Installing: " + " ".join(cmd))
+    proc = subprocess.run(cmd, check=False)
+    if proc.returncode == 0:
+        _log("Web UI dependencies installed successfully.")
+    else:
+        _log(
+            "WARNING: Web UI installation failed. Install manually with:\n"
+            "    pip install 'fastapi[standard]' uvicorn"
+        )
+
+
+def _check_importable(python_path: str, module: str) -> bool:
+    """Return True if *module* can be imported by *python_path*."""
+    result = subprocess.run(
+        [python_path, "-c", f"import {module}"],
+        capture_output=True,
+        check=False,
+    )
+    return result.returncode == 0
+
+
 # ── Write outputs ──────────────────────────────────────────────────────────────
 def _write_env_file(config: dict) -> None:
     ENV_FILE.write_text(json.dumps(config, indent=2) + "\n")
@@ -490,6 +540,7 @@ def main() -> None:
     toolchain_cfg, toolchain_features = _setup_toolchain(snap, python_path=selected_python)
     llm_cfg = _setup_llm()
     neuro_cfg = _setup_neuro_defaults()
+    _setup_webui(python_path=selected_python)
 
     config = {
         "setup_type": python_cfg["setup_type"],
@@ -514,8 +565,12 @@ def main() -> None:
     Features config at:    {FEATURES_FILE}
     Install log at:        {LOG_FILE}
 
-    To start NeuroClaw:
+    To start NeuroClaw (interactive REPL):
         python core/agent/main.py
+
+    To open the browser-based Web UI:
+        python core/agent/main.py --web
+    Then visit  http://localhost:7080  in your browser.
     """))
 
 

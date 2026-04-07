@@ -5,7 +5,8 @@
     "skill_loader":      { "enabled": true,  "description": "Scan skills/*/SKILL.md and register skills" },
     "tool_runtime":      { "enabled": true,  "description": "handler.js / Python handler execution sandbox" },
     "session_manager":   { "enabled": true,  "description": "Session persistence and context-window compression" },
-    "tmux_shell":        { "enabled": true,  "description": "claw-shell tmux-based safe shell execution" }
+    "tmux_shell":        { "enabled": true,  "description": "claw-shell tmux-based safe shell execution" },
+    "web_ui":            { "enabled": true,  "description": "Browser-based chat GUI served at http://localhost:7080 (requires fastapi + uvicorn)" }
   },
   "llm_backends": {
     "openai":            { "enabled": true,  "description": "OpenAI API (GPT-4o, GPT-4-turbo, …)" },

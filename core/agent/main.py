@@ -13,9 +13,18 @@ Architecture
 This module is the self-contained replacement for OpenClaw's agent loop.
 Messaging connectors (WhatsApp, Slack, Telegram) are intentionally excluded;
 see core/config/features.json to audit disabled features.
+
+Usage
+-----
+    # Interactive REPL
+    python core/agent/main.py
+
+    # Browser-based Web UI (served on http://localhost:7080 by default)
+    python core/agent/main.py --web [--port 7080] [--host 127.0.0.1]
 """
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import sys
@@ -260,8 +269,51 @@ class AgentSession:
 # ── Entry point ────────────────────────────────────────────────────────────────
 
 def main() -> None:
-    session = AgentSession()
-    session.start()
+    parser = argparse.ArgumentParser(
+        description="NeuroClaw — neuroscience AI assistant",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python core/agent/main.py                # interactive REPL\n"
+            "  python core/agent/main.py --web          # browser GUI on :7080\n"
+            "  python core/agent/main.py --web --port 8080"
+        ),
+    )
+    parser.add_argument(
+        "--web",
+        action="store_true",
+        help="Start the browser-based Web UI instead of the interactive REPL.",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=7080,
+        metavar="PORT",
+        help="Port for the Web UI (default: 7080). Ignored unless --web is set.",
+    )
+    parser.add_argument(
+        "--host",
+        default="127.0.0.1",
+        metavar="HOST",
+        help="Bind host for the Web UI (default: 127.0.0.1). Ignored unless --web is set.",
+    )
+    args = parser.parse_args()
+
+    if args.web:
+        # Import lazily so FastAPI/uvicorn are only required when --web is used
+        import importlib.util as _ilu
+
+        _srv_path = Path(__file__).parent.parent / "web" / "server.py"
+        _spec = _ilu.spec_from_file_location("neuroclaw_web_server", _srv_path)
+        if _spec is None or _spec.loader is None:
+            print(f"ERROR: Cannot find web server at {_srv_path}", file=sys.stderr)
+            sys.exit(1)
+        _srv_mod = _ilu.module_from_spec(_spec)
+        _spec.loader.exec_module(_srv_mod)  # type: ignore[union-attr]
+        _srv_mod.run_server(host=args.host, port=args.port)
+    else:
+        session = AgentSession()
+        session.start()
 
 
 if __name__ == "__main__":

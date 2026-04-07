@@ -107,8 +107,21 @@ Users simply specify the target dataset, and the system automatically recommends
    ```
 
 3. **Start NeuroClaw**
+
+   **Option A — Interactive REPL (terminal)**
    ```bash
    python core/agent/main.py
+   ```
+
+   **Option B — Browser Web UI** *(recommended)*
+   ```bash
+   python core/agent/main.py --web
+   ```
+   Then open **http://localhost:7080** in your browser. The Web UI features a chat interface, skills sidebar, markdown rendering, and code syntax highlighting.
+
+   To use a custom port or bind to all interfaces (e.g., for remote access):
+   ```bash
+   python core/agent/main.py --web --port 8080 --host 0.0.0.0
    ```
 
 ### Verify Installation
@@ -140,7 +153,11 @@ NeuroClaw/
 │
 ├── core/                           # Self-contained NeuroClaw engine (no OpenClaw required)
 │   ├── agent/                      # LLM conversation loop and tool-call dispatcher
-│   │   └── main.py
+│   │   └── main.py                 # Entry point; --web flag starts the Web UI
+│   ├── web/                        # Browser-based Web UI (FastAPI + WebSocket)
+│   │   ├── server.py               # FastAPI app: WebSocket chat, /api/skills, /api/env
+│   │   └── static/
+│   │       └── index.html          # Dark-theme chat interface (markdown + syntax highlight)
 │   ├── skill-loader/               # Skill scanner: reads skills/*/SKILL.md and registers tools
 │   │   └── loader.py
 │   ├── tool-runtime/               # Executes handler.js / Python handlers
@@ -148,11 +165,11 @@ NeuroClaw/
 │   ├── session/                    # Session persistence and context-window compression
 │   │   └── manager.py
 │   └── config/
-│       └── features.json           # Feature toggles (disable WhatsApp/Slack/etc.)
+│       └── features.json           # Feature toggles (disable WhatsApp/Slack/etc.; enable web_ui)
 │
 ├── installer/                      # Custom setup wizard (replaces OpenClaw's default installer)
 │   ├── setup.py                    # Entry point: python installer/setup.py
-│   ├── config_wizard.py            # Interactive 5-step configuration wizard
+│   ├── config_wizard.py            # Interactive 6-step configuration wizard (incl. Web UI deps)
 │   └── neuro_defaults.json         # Neuroscience-specific default template
 │
 ├── skills/                         # Flat skill directory
