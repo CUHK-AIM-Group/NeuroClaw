@@ -2,7 +2,7 @@
 
 <img src="materials/logo.png" alt="NeuroClaw Logo" width="200" />
 
-# NeuroClaw: From Raw Data to Reproducible Models
+# NeuroClaw: From Raw Brain Data to Auditable Experiment Loops
 
 [中文版 README](README_zh.md)
 
@@ -30,6 +30,7 @@ NeuroClaw prioritizes **data processing** and **model configuration/execution**.
 
 ## 🚀 Updates
 
+- **[2026.04.17]**: Our project homepage is now live. Welcome to visit: https://cuhk-aim-group.github.io/NeuroClaw/
 - **[2026.04.15]**: Added CLI batch benchmark execution, expanded benchmark metrics and scoring utilities.
 - **[2026.04.08]**: We have completed the dataset part of NeuroBench; our NeuroClaw now runs independently and offers a Web UI.
 - **[2026.04.06]**: We begin constructing NeuroBench for multi-agent framework evaluation.
@@ -165,7 +166,24 @@ for s in skills:
 
 ### Benchmark Evaluation
 
-NeuroBench tasks live under `neuro_bench/`, and each task directory contains a `task.md` contract.
+NeuroBench tasks live under `neuro_bench/`, and each task directory contains a `task.md` instruction file.
+
+NeuroBench currently accepts these benchmark configurations:
+- `with-skills`: the agent can use the skills loaded from `skills/`
+- `no-skills`: the baseline run without skills
+- `with-skills` + `no-skills` paired comparison: enable `--benchmark-compare-skills` to run both variants for the same task set
+
+Benchmark scoring is handled separately with `--score-benchmark`: it reads reports in `output/`, applies a GPT-5.4 weighted rubric, and generates numeric scores for planning completeness, tool/skill reasonableness, and command/code correctness. Skill-call counts are recorded separately and used for efficiency analysis.
+
+To score existing benchmark reports:
+```bash
+python core/agent/main.py --score-benchmark
+```
+
+To speed up scoring on larger runs:
+```bash
+python core/agent/main.py --score-benchmark --score-workers 8
+```
 
 **Web benchmark mode**
 ```bash
@@ -175,6 +193,11 @@ python core/agent/main.py --web --benchmark
 **CLI benchmark batch runner**
 ```bash
 python core/agent/main.py --benchmark
+```
+
+To run the paired skill comparison in CLI mode:
+```bash
+python core/agent/main.py --benchmark --benchmark-compare-skills
 ```
 
 In CLI benchmark mode, NeuroClaw will ask for:
@@ -188,7 +211,7 @@ Then it will:
 - print progress in the terminal only
 - save reports under `output/<model_name>/`, with one markdown report per case and run
 
-The benchmark reports include the solution thinking, tools used, and the commands or code that were used or suggested.
+The benchmark reports include the solution thinking, skills used, skill-call counts, and the commands or code that were used or suggested.
 
 ---
 

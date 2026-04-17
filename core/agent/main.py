@@ -1025,6 +1025,148 @@ def _get_benchmark_scorer_client() -> Any:
     return _BENCHMARK_SCORER_CLIENT_CACHE
 
 
+def _score_batch_benchmark_case(
+    llm_client: Any,
+    task_text: str,
+    runs_by_model: dict[str, list[dict[str, Any]]],
+) -> dict[str, list[dict[str, Any]]]:
+    """Score multiple model-runs for the same task in a single LLM call."""
+    run_blocks: list[str] = []
+    for model_name in sorted(runs_by_model.keys()):
+        for run_data in runs_by_model[model_name]:
+            run_index = int(run_data.get("run_index", 1) or 1)
+            report_text = str(run_data.get("report_text", ""))
+            run_blocks.append(
+                f"=== MODEL: {model_name} | RUN: {run_index} ===\n"
+                f"{report_text}\n"
+                "=== END REPORT ==="
+            )
+
+    scoring_system = (
+        "You are a strict benchmark evaluator for neuroscience-agent outputs. "
+        "You evaluate multiple model-runs for the SAME task to keep scoring criteria consistent. "
+        "Return JSON only."
+    )
+    scoring_user = (
+        "Evaluate EACH report on a 1-10 scale for three dimensions:\n"
+        "1) planning_completeness\n"
+        "2) tool_reasonableness\n"
+        "3) code_command_correctness\n"
+        "Do not score tool_efficiency here; it is computed separately.\n"
+        "\n"
+        "Return a strict JSON ARRAY. Each item must contain keys exactly:\n"
+        "model, run_index, planning_completeness, tool_reasonableness, code_command_correctness, brief_justification\n"
+        "\n"
+        f"Task contract:\n{task_text}\n\n"
+        "Reports:\n"
+        + "\n\n".join(run_blocks)
+    )
+
+    resp = llm_client.chat.completions.create(
+        model=BENCHMARK_SCORER_MODEL,
+        messages=[
+            {"role": "system", "content": scoring_system},
+            {"role": "user", "content": scoring_user},
+        ],
+    )
+    content = ""
+    try:
+        content = str(resp.choices[0].message.content or "")
+    except Exception:
+        content = ""
+
+    parsed_list: list[Any] = []
+    try:
+        parsed = json.loads(content)
+        if isinstance(parsed, list):
+            parsed_list = parsed
+        elif isinstance(parsed, dict):
+            parsed_list = [parsed]
+    except Exception:
+        parsed_list = []
+
+    results_by_model: dict[str, list[dict[str, Any]]] = {name: [] for name in runs_by_model.keys()}
+    for item in parsed_list:
+        if not isinstance(item, dict):
+            continue
+        model = str(item.get("model", "")).strip()
+        if model not in runs_by_model:
+            continue
+        run_index = max(1, int(item.get("run_index", 1) or 1))
+
+        report_text = ""
+        for run_data in runs_by_model[model]:
+            if int(run_data.get("run_index", 1) or 1) == run_index:
+                report_text = str(run_data.get("report_text", ""))
+                break
+
+        results_by_model[model].append(
+            {
+                "run_index": run_index,
+                "planning_completeness": _clamp_score_1_10(item.get("planning_completeness", 1)),
+                "tool_reasonableness": _clamp_score_1_10(item.get("tool_reasonableness", 1)),
+                "code_command_correctness": _clamp_score_1_10(item.get("code_command_correctness", 1)),
+                "tool_call_count": _extract_tool_call_count_from_report(report_text),
+                "brief_justification": str(item.get("brief_justification", "")).strip(),
+                "raw_model_output": content,
+            }
+        )
+
+    return results_by_model
+
+
+def _score_benchmark_batch_job(job: dict[str, Any]) -> dict[str, Any]:
+    """Score all model runs for one case in one batch call."""
+    task_file = Path(str(job.get("task_file", "")))
+    case_id = str(job.get("case_id", ""))
+    runs_by_model_raw = job.get("runs_by_model", {})
+
+    task_text = task_file.read_text(encoding="utf-8")
+    scorer_client = _get_benchmark_scorer_client()
+
+    runs_by_model: dict[str, list[dict[str, Any]]] = {}
+    run_meta: dict[tuple[str, int], dict[str, Any]] = {}
+    for model_name, run_entries in runs_by_model_raw.items():
+        runs_by_model[model_name] = []
+        for entry in run_entries:
+            report_file = Path(str(entry.get("report_file", "")))
+            run_index = max(1, int(entry.get("run_index", 1) or 1))
+            report_text = report_file.read_text(encoding="utf-8")
+
+            runs_by_model[model_name].append({"run_index": run_index, "report_text": report_text})
+            token_usage = _extract_token_usage_from_report_text(report_text)
+            run_meta[(model_name, run_index)] = {
+                "report_file": str(report_file),
+                "elapsed_seconds": _extract_elapsed_seconds_from_report(report_text),
+                "prompt_tokens": token_usage["prompt_tokens"],
+                "completion_tokens": token_usage["completion_tokens"],
+                "total_tokens": token_usage["total_tokens"],
+            }
+
+    scored = _score_batch_benchmark_case(
+        llm_client=scorer_client,
+        task_text=task_text,
+        runs_by_model=runs_by_model,
+    )
+
+    packed_results: list[dict[str, Any]] = []
+    for model_name, runs in scored.items():
+        for run in runs:
+            run_index = max(1, int(run.get("run_index", 1) or 1))
+            packed_results.append(
+                {
+                    "model_name": model_name,
+                    "case_id": case_id,
+                    "run_index": run_index,
+                    "task_file": str(task_file),
+                    **run_meta.get((model_name, run_index), {}),
+                    **run,
+                }
+            )
+
+    return {"case_id": case_id, "results": packed_results}
+
+
 def _score_benchmark_job(job: dict[str, Any]) -> dict[str, Any]:
     task_file = Path(str(job.get("task_file", "")))
     report_file = Path(str(job.get("report_file", "")))
@@ -1217,39 +1359,55 @@ def _score_benchmark_reports(
     }
 
     jobs: list[dict[str, Any]] = []
-    for model_name, case_map in sorted(complete_models.items()):
-        for case_id in common_case_ids:
+    for case_id in common_case_ids:
+        runs_by_model: dict[str, list[dict[str, Any]]] = {}
+        for model_name in sorted(complete_models.keys()):
+            case_map = complete_models[model_name]
             run_entries = case_map[case_id][:required_runs_per_case]
-            for entry in run_entries:
-                jobs.append(
-                    {
-                        "model_name": model_name,
-                        "case_id": case_id,
-                        "run_index": int(entry.get("run_index", 1) or 1),
-                        "task_file": str(task_contracts[case_id]),
-                        "report_file": str(entry["report_file"]),
-                    }
-                )
+            runs_by_model[model_name] = [
+                {
+                    "run_index": int(entry.get("run_index", 1) or 1),
+                    "report_file": str(entry["report_file"]),
+                }
+                for entry in run_entries
+            ]
+        jobs.append(
+            {
+                "task_file": str(task_contracts[case_id]),
+                "case_id": case_id,
+                "runs_by_model": runs_by_model,
+            }
+        )
 
     total_jobs = len(jobs)
     print(f"Total scoring jobs: {total_jobs}", flush=True)
 
-    per_case_results: dict[tuple[str, str], list[dict[str, Any]]] = {}
-    with concurrent.futures.ProcessPoolExecutor(max_workers=workers) as executor:
-        futures = [executor.submit(_score_benchmark_job, job) for job in jobs]
-        for done_jobs, future in enumerate(concurrent.futures.as_completed(futures), start=1):
-            try:
-                result = future.result()
-            except Exception as exc:
-                print(f"[score job {done_jobs}/{total_jobs}] ERROR: worker crashed: {exc}", flush=True)
-                continue
+    print(
+        "Note: Batch scoring mode enabled - same task scored together for consistent standards",
+        flush=True,
+    )
 
+    per_case_results: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    for done_jobs, job in enumerate(jobs, start=1):
+        try:
+            batch_result = _score_benchmark_batch_job(job)
+        except Exception as exc:
+            print(f"[score job {done_jobs}/{total_jobs}] ERROR: batch scoring failed: {exc}", flush=True)
+            continue
+
+        case_id = str(batch_result.get("case_id", ""))
+        results_list = batch_result.get("results", [])
+        for result in results_list:
             model_name = str(result.get("model_name", ""))
-            case_id = str(result.get("case_id", ""))
             run_index = max(1, int(result.get("run_index", 1) or 1))
             result["run_index"] = run_index
             per_case_results.setdefault((model_name, case_id), []).append(result)
-            print(f"Scoring [{done_jobs}/{total_jobs}] model={model_name} case={case_id} run={run_index}", flush=True)
+
+        print(
+            f"Scoring [{done_jobs}/{total_jobs}] case={case_id} "
+            f"(batch scored {len(results_list)} model-runs)",
+            flush=True,
+        )
 
     for model_name, case_map in sorted(complete_models.items()):
         per_case: dict[str, Any] = {}

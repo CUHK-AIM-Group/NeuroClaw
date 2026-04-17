@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NeuroClaw | 可执行且可复现的神经影像智能体</title>
+    <meta
+      name="description"
+      content="NeuroClaw 是面向神经科学的智能体平台，可执行、可审计、可复现地运行神经影像工作流与实验闭环。"
+    />
+    <meta property="og:title" content="NeuroClaw" />
+    <meta
+      property="og:description"
+      content="从原始神经影像数据到可审计、可复现的实验闭环。"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://raw.githubusercontent.com/CUHK-AIM-Group/NeuroClaw/main/materials/logo.png" />
+    <meta name="theme-color" content="#0f5c57" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-a"></div>
+    <div class="bg-orb orb-b"></div>
+
+    <header class="topbar">
+      <a class="brand" href="index-zh.html" aria-label="NeuroClaw 首页">
+        <img src="assets/logo.png" alt="NeuroClaw logo" />
+        <span>NeuroClaw</span>
+      </a>
+      <nav>
+        <a href="index-zh.html">Home</a>
+        <a href="neurobench-zh.html">NeuroBench</a>
+        <a href="faq-zh.html">FAQ</a>
+        <a href="get-started-zh.html">Get Started</a>
+      </nav>
+      <div class="topbar-actions">
+        <a class="btn ghost" href="index.html" aria-label="Switch to English">EN</a>
+        <a class="btn ghost" href="mailto:chengwang@link.cuhk.edu.hk">联系我方</a>
+      </div>
+    </header>
+
+    <main id="home">
+      <section class="hero reveal">
+        <p class="eyebrow">面向神经科学的智能体平台</p>
+        <h1>从原始脑数据到 <span>可审计实验闭环</span></h1>
+        <p class="lead">
+          NeuroClaw 将神经影像工作流转化为可执行、可迭代、可复现的研究闭环，覆盖数据准备、模型执行、验证与反思。
+        </p>
+        <div class="institutions-logos" aria-label="Institutions">
+          <button class="institution-logo" type="button" aria-label="CUHK">
+            <img src="assets/logos/cuhk.png" alt="CUHK logo" />
+          </button>
+          <button class="institution-logo" type="button" aria-label="Massachusetts General Hospital">
+            <img src="assets/logos/mgh.png" alt="Massachusetts General Hospital logo" />
+          </button>
+          <button class="institution-logo" type="button" aria-label="Lehigh University">
+            <img src="assets/logos/lehigh.png" alt="Lehigh University logo" />
+          </button>
+        </div>
+        <div class="actions">
+          <a class="btn" href="https://github.com/CUHK-AIM-Group/NeuroClaw" target="_blank" rel="noreferrer">查看仓库</a>
+          <button class="btn ghost disabled" type="button" aria-disabled="true">
+            <span>arXiv 论文</span>
+            <small>即将上线</small>
+          </button>
+        </div>
+        <div class="metrics">
+          <article>
+            <h3>100</h3>
+            <p>NeuroBench 任务</p>
+          </article>
+          <article>
+            <h3>Skill Hierarchy</h3>
+            <p>base-subagent-interface</p>
+          </article>
+          <article>
+            <h3>ADNI, HCP and more</h3>
+            <p>数据集感知编排</p>
+          </article>
+          <article>
+            <h3>Traceable</h3>
+            <p>执行与审计日志</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel reveal">
+        <h2>NeuroBench 的优势</h2>
+        <div class="cards">
+          <article>
+            <h3>真实场景导向</h3>
+            <p>覆盖从原始数据到科研结果的完整链路，而非单轮问答，强调可执行性和可复现性。</p>
+          </article>
+          <article>
+            <h3>多层评测维度</h3>
+            <p>同时评估规划质量、工具/技能调用合理性、命令与代码正确性、输出有效性与复现准备度。</p>
+          </article>
+          <article>
+            <h3>技能增强可对照</h3>
+            <p>支持 with-skills 与 no-skills 对照，便于量化技能库对任务完成质量和效率的贡献。</p>
+          </article>
+          <article>
+            <h3>可审计可迭代</h3>
+            <p>强调执行轨迹、日志和阶段性产物，支持科研中的多轮实验闭环与误差修正。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel reveal">
+        <h2>覆盖技能库与任务体系</h2>
+        <div class="cards">
+          <article>
+            <h3>1. 基础处理</h3>
+            <p><strong>1.1 数据格式转换与 BIDS 标准化</strong>：BIDS 组织、DICOM↔NIfTI 转换、元数据提取。</p>
+            <p><strong>1.2 环境配置与工程工具</strong>：Conda 环境管理、依赖解析、Git、Overleaf。</p>
+            <p><strong>1.3 文献与信息检索</strong>：学术论文检索、多引擎搜索。</p>
+          </article>
+          <article>
+            <h3>2. 工具相关</h3>
+            <p><strong>2.1 结构与功能工具链</strong>：FreeSurfer 与 FSL 覆盖皮层重建、分割、配准、GLM 与 ICA 等核心流程。</p>
+            <p><strong>2.2 扩散与 HCP 集成</strong>：DIPY 与 HCP 流水线支持去噪、张量拟合、纤维建模、束追踪与多模态协同处理。</p>
+            <p><strong>2.3 集成分析工具栈</strong>：Nilearn、fMRIPrep、QSIPrep、XCP-D、CONN、MNE、MARS 支持 ROI/连接分析、预处理、EEG 与统计流程。</p>
+          </article>
+          <article>
+            <h3>3. 模态相关</h3>
+            <p><strong>3.1 sMRI</strong>：T1/T2 重建、组织分割、皮层分区、白质病灶分割、结构预处理。</p>
+            <p><strong>3.2 fMRI</strong>：预处理、去噪、ROI 提取、静息态/任务态连接性、有效连接性、GLM 分析。</p>
+            <p><strong>3.3 DWI 与 EEG</strong>：DWI 涵盖涡流校正、张量拟合、FA/MD、束追踪与连接组；EEG 包含频谱分析、伪迹去除与特征提取。</p>
+          </article>
+          <article>
+            <h3>4. 数据集相关</h3>
+            <p><strong>4.1 ADNI</strong>：数据获取、BIDS 整理、预处理、ROI 提取、分析、VQA 数据集生成。</p>
+            <p><strong>4.2 HCP</strong>：数据下载、BIDS 整理、结构/功能/扩散处理、多模态集成。</p>
+            <p><strong>4.3 其他公共数据集</strong>：尚未覆盖 UKB、ADHD200、ABCD、ABIDE、COBRE、PNC、HBN、UCLA。</p>
+          </article>
+          <article>
+            <h3>5. 模型相关</h3>
+            <p><strong>5.1 深度学习</strong>：BrainGNN、FM-APP、NeuroStorm 等模型路线，支持表型预测（分类/回归），输入可为 fMRI ROI 特征与可选 sMRI 特征。</p>
+            <p><strong>5.2 非深度学习</strong>：GLM、ICA、DictLearning、SVM、SpaceNet、K-means、Hierarchical、Filtering、Detrending，用于激活分析、分解建模、分类、脑分区与信号去噪。</p>
+            <p><strong>5.3 执行编排</strong>：统一模型入口负责预处理依赖匹配、输入输出映射与可执行计划生成，覆盖深度与传统方法。</p>
+          </article>
+          <article>
+            <h3>6. 研究工作流相关</h3>
+            <p><strong>6.1 端到端单模态工作流</strong>：从原始数据到最终分析结果的完整 sMRI/fMRI/DWI 流水线。</p>
+            <p><strong>6.2 端到端数据集特定工作流</strong>：完成 ADNI 或 HCP 多模态处理链并集成结果。</p>
+            <p><strong>6.3 科研产出支持</strong>：文献调研、学术写作辅助、衍生数据集生成。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="cta reveal">
+        <h2>开始使用 NeuroClaw</h2>
+        <p>使用 NeuroClaw 在你的实验室中原型化可审计的神经影像管线和自治实验闭环。</p>
+        <div class="actions">
+          <a class="btn" href="get-started-zh.html">快速开始</a>
+          <a class="btn ghost" href="neurobench-zh.html">NeuroBench</a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        NeuroClaw © 2026 ·
+        <a href="http://www.ee.cuhk.edu.hk/~yxyuan/" target="_blank" rel="noreferrer">CUHK-AIM-Group</a>
+      </p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

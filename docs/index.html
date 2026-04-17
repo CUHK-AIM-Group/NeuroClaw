@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NeuroClaw | Executable and Reproducible Agentic Neuroimaging</title>
+    <meta
+      name="description"
+      content="NeuroClaw is a neuroscience-first agentic platform for executable, auditable, and reproducible neuroimaging workflows and experiment loops."
+    />
+    <meta property="og:title" content="NeuroClaw" />
+    <meta
+      property="og:description"
+      content="From raw neuroimaging data to reproducible, auditable experiment loops."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://raw.githubusercontent.com/CUHK-AIM-Group/NeuroClaw/main/materials/logo.png" />
+    <meta name="theme-color" content="#0f5c57" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-a"></div>
+    <div class="bg-orb orb-b"></div>
+
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="NeuroClaw Home">
+        <img
+          src="https://raw.githubusercontent.com/CUHK-AIM-Group/NeuroClaw/main/materials/logo.png"
+          alt="NeuroClaw logo"
+        />
+        <span>NeuroClaw</span>
+      </a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="neurobench.html">NeuroBench</a>
+        <a href="faq.html">FAQ</a>
+        <a href="get-started.html">Get Started</a>
+      </nav>
+      <div class="topbar-actions">
+        <a class="btn ghost" href="index-zh.html" aria-label="Switch to Chinese">中文</a>
+        <a class="btn ghost" href="mailto:chengwang@link.cuhk.edu.hk">Contact Us</a>
+      </div>
+    </header>
+
+    <main id="home">
+      <section class="hero reveal">
+        <p class="eyebrow">Neuroscience-First Agentic Platform</p>
+        <h1>From Raw Brain Data to <span>Auditable Experiment Loops</span></h1>
+        <p class="lead">
+          NeuroClaw turns neuroimaging workflows into executable, iterative, and reproducible research loops across data preparation, model execution, validation, and refinement.
+        </p>
+        <div class="institutions-logos" aria-label="Institutions">
+          <button class="institution-logo" type="button" aria-label="CUHK">
+            <img src="assets/logos/cuhk.png" alt="CUHK logo" />
+          </button>
+          <button class="institution-logo" type="button" aria-label="Massachusetts General Hospital">
+            <img src="assets/logos/mgh.png" alt="Massachusetts General Hospital logo" />
+          </button>
+          <button class="institution-logo" type="button" aria-label="Lehigh University">
+            <img src="assets/logos/lehigh.png" alt="Lehigh University logo" />
+          </button>
+        </div>
+        <div class="actions">
+          <a class="btn" href="https://github.com/CUHK-AIM-Group/NeuroClaw" target="_blank" rel="noreferrer">Explore Repository</a>
+          <button class="btn ghost disabled" type="button" aria-disabled="true">
+            <span>arXiv Paper</span>
+            <small>Coming soon</small>
+          </button>
+        </div>
+        <div class="metrics">
+          <article>
+            <h3>100</h3>
+            <p>NeuroBench Tasks</p>
+          </article>
+          <article>
+            <h3>Skill Hierarchy</h3>
+            <p>base-subagent-interface</p>
+          </article>
+          <article>
+            <h3>ADNI, HCP and more</h3>
+            <p>Dataset-Aware Orchestration</p>
+          </article>
+          <article>
+            <h3>Traceable</h3>
+            <p>Execution and Audit Logs</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel reveal">
+        <h2>NeuroBench Strengths</h2>
+        <div class="cards">
+          <article>
+            <h3>Real Workflow Coverage</h3>
+            <p>Designed for end-to-end neuroimaging execution instead of one-shot QA, with strong emphasis on reproducibility.</p>
+          </article>
+          <article>
+            <h3>Multi-Dimensional Evaluation</h3>
+            <p>Evaluates planning quality, tool/skill usage, command/code correctness, output validity, and reproducibility readiness.</p>
+          </article>
+          <article>
+            <h3>Skill vs Baseline Comparison</h3>
+            <p>Supports with-skills and no-skills paired runs to quantify the practical value of the skill library.</p>
+          </article>
+          <article>
+            <h3>Auditable Experiment Loops</h3>
+            <p>Tracks execution traces and intermediate artifacts to support iterative scientific workflows and debugging.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel reveal">
+        <h2>Skill Library Coverage</h2>
+        <div class="cards">
+          <article>
+            <h3>1. Basic Processing</h3>
+            <p><strong>1.1 Data and BIDS</strong>: DICOM↔NIfTI conversion, BIDS organization, metadata checks.</p>
+            <p><strong>1.2 Environment and Engineering</strong>: Conda/dependency setup, Docker options, Git and Overleaf workflows.</p>
+            <p><strong>1.3 Literature Search</strong>: academic retrieval and multi-engine evidence collection.</p>
+          </article>
+          <article>
+            <h3>2. Tool-Centric Skills</h3>
+            <p><strong>2.1 FreeSurfer + FSL</strong>: reconstruction, segmentation, registration, GLM/ICA routes.</p>
+            <p><strong>2.2 DIPY + HCP Pipelines</strong>: diffusion denoising, tensor/tract processing, multimodal handoff.</p>
+            <p><strong>2.3 Integrated Stack</strong>: Nilearn, fMRIPrep, QSIPrep, XCP-D, CONN, MNE, MARS.</p>
+          </article>
+          <article>
+            <h3>3. Modality-Centric Skills</h3>
+            <p><strong>3.1 sMRI</strong>: T1/T2 structural preprocessing, segmentation, cortical parcellation, WMH support.</p>
+            <p><strong>3.2 fMRI</strong>: denoising, ROI extraction, connectivity analysis, GLM routes.</p>
+            <p><strong>3.3 DWI + EEG</strong>: diffusion metrics/tractography plus EEG cleaning and feature extraction.</p>
+          </article>
+          <article>
+            <h3>4. Dataset-Centric Skills</h3>
+            <p><strong>4.1 ADNI</strong>: acquisition, BIDS organization, preprocessing, ROI analysis, derived datasets.</p>
+            <p><strong>4.2 HCP</strong>: structural/functional/diffusion execution with multimodal integration.</p>
+            <p><strong>4.3 Expansion Targets</strong>: UKB, ADHD200, ABCD, ABIDE, COBRE, PNC, HBN, UCLA.</p>
+          </article>
+          <article>
+            <h3>5. Model-Centric Skills</h3>
+            <p><strong>5.1 Deep Learning</strong>: BrainGNN, FM-APP, NeuroStorm for phenotype prediction.</p>
+            <p><strong>5.2 Non-Deep-Learning</strong>: GLM, ICA, DictLearning, SVM, SpaceNet, clustering, filtering, detrending.</p>
+            <p><strong>5.3 Routing</strong>: unified model entry with preprocessing dependency checks.</p>
+          </article>
+          <article>
+            <h3>6. Research Workflow Skills</h3>
+            <p><strong>6.1 Single-Modality Pipelines</strong>: end-to-end sMRI/fMRI/DWI from raw data to outputs.</p>
+            <p><strong>6.2 Dataset-Specific Pipelines</strong>: ADNI/HCP multimodal chains with QC checkpoints.</p>
+            <p><strong>6.3 Research Output</strong>: method design, writing support, and auditable experiment logs.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="cta reveal">
+        <h2>Build with NeuroClaw</h2>
+        <p>Use NeuroClaw to prototype auditable neuroimaging pipelines and autonomous experiment loops in your lab.</p>
+        <div class="actions">
+          <a class="btn" href="get-started.html">Get Started</a>
+          <a class="btn ghost" href="neurobench.html">NeuroBench</a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        NeuroClaw © 2026 ·
+        <a href="http://www.ee.cuhk.edu.hk/~yxyuan/" target="_blank" rel="noreferrer">CUHK-AIM-Group</a>
+      </p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
