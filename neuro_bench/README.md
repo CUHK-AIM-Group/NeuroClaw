@@ -8,6 +8,10 @@ Current status:
 - Coverage from utility-level setup to multi-modal integrated pipelines
 - Task design centered on practical deliverables (processed images, ROI tables, connectomes, QC artifacts)
 
+<div align="center">
+  <img src="../materials/benchmark-preview.png" alt="NeuroBench Preview" style="width: 95%; max-width: 100%;" />
+</div>
+
 ## What's Included
 
 The benchmark is grouped by workflow families so you can evaluate specific capabilities or run larger scenario bundles.
@@ -45,7 +49,7 @@ NeuroBench accepts the following benchmark configurations:
 - `no-skills`: baseline run with skills disabled
 - paired comparison: `--benchmark-compare-skills` runs both variants for the same task set
 
-Benchmark scoring is handled separately with `--score-benchmark`. It reads reports in `output/`, applies a GPT-5.4 weighted rubric, and generates numeric scores for planning completeness, tool/skill reasonableness, and command/code correctness. Skill-call counts are tracked separately for efficiency analysis.
+Benchmark scoring is handled separately with `--score-benchmark`. It reads reports in `output/`, applies a GPT-5.4 weighted rubric, and generates numeric scores for planning completeness, tool/skill reasonableness, and command/code correctness. For fairness, each task case is jointly scored across all comparable models in one batch to reduce scoring-standard drift. Skill-call counts are tracked separately for efficiency analysis.
 
 To score existing benchmark reports:
 ```bash

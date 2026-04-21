@@ -30,6 +30,7 @@ NeuroClaw prioritizes **data processing** and **model configuration/execution**.
 
 ## 🚀 Updates
 
+- **[2026.04.22]**: v1.0 released — stable release with improvements and full documentation.
 - **[2026.04.17]**: Our project homepage is now live. Welcome to visit: https://cuhk-aim-group.github.io/NeuroClaw/
 - **[2026.04.15]**: Added CLI batch benchmark execution, expanded benchmark metrics and scoring utilities.
 - **[2026.04.08]**: We have completed the dataset part of NeuroBench; our NeuroClaw now runs independently and offers a Web UI.
@@ -40,7 +41,7 @@ NeuroClaw prioritizes **data processing** and **model configuration/execution**.
 ## ✨ Key Features
 
 <div align="center">
-  <img src="materials/main.png" alt="NeuroClaw Framework Overview" style="width: 95%; max-width: 100%;" />
+  <img src="materials/framework.png" alt="NeuroClaw Framework Overview" style="width: 95%; max-width: 100%;" />
 </div>
 
 ### 🔄 Dataset-First Architecture
@@ -105,11 +106,12 @@ Users simply specify the target dataset, and the system automatically recommends
   - Python runtime (system / conda / Docker)
   - CUDA / GPU configuration and optional PyTorch install
   - Neuroscience toolchain paths (FSL, FreeSurfer, dcm2niix, etc.)
-  - LLM backend (OpenAI, Anthropic, or local model)
+  - LLM backend selection (OpenAI, Anthropic, or local model)
   - Default BIDS and output directories
   - Web UI dependencies and attachment parsers (PDF/DOCX/XLSX/PPTX)
 
    Settings are saved to `neuroclaw_environment.json` and loaded automatically on every future session.
+   Setup does not ask for an API key. Pass the key only at runtime with `--api-key`, or export the configured environment variable before startup.
 
    For a quick non-interactive setup with auto-detected defaults:
    ```bash
@@ -125,14 +127,16 @@ Users simply specify the target dataset, and the system automatically recommends
 
    **Option A — Interactive REPL (terminal)**
    ```bash
-   python core/agent/main.py
+  python core/agent/main.py --api-key "$OPENAI_API_KEY"
    ```
 
    **Option B — Browser Web UI** *(recommended)*
    ```bash
-   python core/agent/main.py --web
+  python core/agent/main.py --web --api-key "$OPENAI_API_KEY"
    ```
    Then open **http://localhost:7080** in your browser. The Web UI features a chat interface, skills sidebar, markdown rendering, and code syntax highlighting.
+
+  If you prefer environment variables, export the provider-specific key first and start NeuroClaw without `--api-key`.
 
     Web UI attachment parsing currently supports these file types:
     - Text/config/code: `.txt`, `.md`, `.markdown`, `.json`, `.yaml`, `.yml`, `.csv`, `.tsv`, `.py`, `.js`, `.ts`, `.tsx`, `.jsx`, `.sh`, `.bash`, `.zsh`, `.sql`, `.html`, `.css`, `.xml`, `.log`, `.rst`, `.ini`, `.toml`, `.cfg`
@@ -142,12 +146,14 @@ Users simply specify the target dataset, and the system automatically recommends
 
    To use a custom port or bind to all interfaces (e.g., for remote access):
    ```bash
-   python core/agent/main.py --web --port 8080 --host 0.0.0.0
+  python core/agent/main.py --web --port 8080 --host 0.0.0.0 --api-key "$OPENAI_API_KEY"
    ```
 
 <div align="center">
   <img src="materials/index.png" alt="NeuroClaw Feature Overview" style="width: 80%; max-width: 100%;" />
 </div>
+
+> Note: We provide benchmark run results and per-model outputs under `materials/benchmark_results/`. These artifacts can be used as practical references when running NeuroClaw benchmarks or reproducing model outputs.
 
 ### Verify Installation
 ```bash
@@ -173,7 +179,7 @@ NeuroBench currently accepts these benchmark configurations:
 - `no-skills`: the baseline run without skills
 - `with-skills` + `no-skills` paired comparison: enable `--benchmark-compare-skills` to run both variants for the same task set
 
-Benchmark scoring is handled separately with `--score-benchmark`: it reads reports in `output/`, applies a GPT-5.4 weighted rubric, and generates numeric scores for planning completeness, tool/skill reasonableness, and command/code correctness. Skill-call counts are recorded separately and used for efficiency analysis.
+Benchmark scoring is handled separately with `--score-benchmark`: it reads reports in `output/`, applies a GPT-5.4 weighted rubric, and generates numeric scores for planning completeness, tool/skill reasonableness, and command/code correctness. For fairness, each task case is scored in one batch across all comparable models to reduce scoring-standard drift. Skill-call counts are recorded separately and used for efficiency analysis.
 
 To score existing benchmark reports:
 ```bash
@@ -250,6 +256,7 @@ NeuroClaw/
 │   ├── adni-skill/
 │   ├── bids-organizer/
 │   ├── beautiful-log/
+│   ├── brain-visualization/
 │   ├── claw-shell/
 │   ├── conda-env-manager/
 │   ├── conn-tool/
@@ -257,7 +264,8 @@ NeuroClaw/
 │   ├── dependency-planner/
 │   ├── dipy-tool/
 │   ├── docker-env-manager/
-│   ├── dti-skill/
+│   ├── nibabel-skill/
+│   ├── dwi-skill/
 │   ├── eeg-skill/
 │   ├── experiment-controller/
 │   ├── fmri-skill/
@@ -267,6 +275,8 @@ NeuroClaw/
 │   ├── git-essentials/
 │   ├── git-workflows/
 │   ├── hcp-skill/
+│   ├── ukb-skill/
+│   ├── harness-core/
 │   ├── hcppipeline-tool/
 │   ├── method-design/
 │   ├── mne-eeg-tool/
@@ -286,9 +296,9 @@ NeuroClaw/
 │   ├── T00_installer_validation/   # Validates installer output
 │   └── …
 │
-├── materials/                      # Research materials and reference resources
+├── materials/                      # Research materials, benchmark run results, and model outputs
 │   ├── CVPR_2026/
-│   └── examples/
+│   └── benchmark_results/
 │
 └── LICENSE                         # License
 
@@ -316,9 +326,8 @@ NeuroClaw/
 | `overleaf-skill` | Overleaf sync and collaborative manuscript operations | ✅ |
 | `academic-research-hub` | Multi-source academic search and paper retrieval | ✅ |
 | `bids-organizer` | Base skill for organizing raw data into BIDS structure | ✅ |
-| `brain-visualization` | Brain network, atlas activation, and FreeSurfer surface visualization | ✅ |
 | `beautiful-log` | Export clean User/NeuroClaw dialogue into beautiful HTML logs | ✅ |
-| `harness-core` | Harness engineering SDK (verification, checkpointing, audit logging, drift detection) | ✅ |
+| `skill-updater` | Skill updater and management utilities | ✅ |
 
 ### Interface Layer (Task Orchestration)
 | Skill | Function | Status |
@@ -335,13 +344,15 @@ Subagent in NeuroClaw includes four categories: **tool**, **model**, **dataset**
 #### Tool
 | Skill | Function | Status |
 |------|----------|--------|
+| `brain-visualization` | Publication-ready figures and 3D assets (connectomes, atlas summaries, FreeSurfer PLY) | ✅ |
+| `harness-core` | Core harness SDK: verification, checkpointing, drift detection, audit logging | ✅ |
 | `mne-eeg-tool` | Base-layer MNE-Python implementation for EEG | ✅ |
 | `fsl-tool` | FSL-based sMRI/fMRI/DWI processing utilities | ✅ |
 | `fmriprep-tool` | fMRIPrep pipeline wrapper and execution | ✅ |
 | `qsiprep-tool` | qsiPrep pipeline wrapper for diffusion MRI | ✅ |
 | `hcppipeline-tool` | HCP-style processing pipeline utilities | ✅ |
 | `dipy-tool` | Diffusion MRI processing via DIPY | ✅ |
-| `nibabel-skill` | Low-level neuroimaging file I/O and affine-aware data access | ✅ |
+| `nibabel-skill` | Low-level neuroimaging I/O and geometry handling (NIfTI, affine, FreeSurfer I/O) | ✅ |
 | `nilearn-tool` | Fast neuroimaging feature extraction and decoding prep | ✅ |
 | `conn-tool` | Functional connectivity computation and analysis | ✅ |
 | `freesurfer-tool` | FreeSurfer-based MRI processing and segmentation | ✅ |
@@ -368,7 +379,7 @@ Subagent in NeuroClaw includes four categories: **tool**, **model**, **dataset**
 |------|----------|--------|
 | `adni-skill` | ADNI dataset automated processing workflow | ✅ |
 | `hcp-skill` | HCP-YA dataset automated processing workflow | ✅ |
-| `ukb-skill` | UKB brain imaging automated processing workflow | ⏳ |
+| `ukb-skill` | UKB brain imaging automated processing workflow | ✅ |
 
 #### Modality
 | Skill | Function | Status |
@@ -376,7 +387,7 @@ Subagent in NeuroClaw includes four categories: **tool**, **model**, **dataset**
 | `eeg-skill` | EEG preprocessing and feature extraction workflows | ✅ |
 | `fmri-skill` | Functional MRI preprocessing and analysis workflows | ✅ |
 | `smri-skill` | Structural MRI preprocessing and analysis workflows | ✅ |
-| `dti-skill` | Diffusion MRI preprocessing and analysis workflows | ✅ |
+| `dwi-skill` | Diffusion MRI preprocessing and analysis workflows | ✅ |
 
 **Legend**: ✅ Implemented | 🏗️ In Development | ⏳ Planned
 
