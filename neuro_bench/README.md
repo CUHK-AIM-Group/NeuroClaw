@@ -45,7 +45,7 @@ NeuroBench accepts the following benchmark configurations:
 - `no-skills`: baseline run with skills disabled
 - paired comparison: `--benchmark-compare-skills` runs both variants for the same task set
 
-Benchmark scoring is handled separately with `--score-benchmark`. It reads reports in `output/`, applies a GPT-5.4 weighted rubric, and generates numeric scores for planning completeness, tool/skill reasonableness, and command/code correctness. Skill-call counts are tracked separately for efficiency analysis.
+Benchmark scoring is handled separately with `--score-benchmark`. It reads reports in `output/`, applies a GPT-5.4 weighted rubric, and generates numeric scores for planning completeness, tool/skill reasonableness, and command/code correctness. For fairness, each task case is jointly scored across all comparable models in one batch to reduce scoring-standard drift. Skill-call counts are tracked separately for efficiency analysis.
 
 To score existing benchmark reports:
 ```bash

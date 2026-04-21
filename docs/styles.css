@@ -337,9 +337,9 @@ h1 span {
 
 .split {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-columns: 1fr;
   gap: 18px;
-  align-items: center;
+  align-items: stretch;
 }
 
 .split ul {
@@ -534,10 +534,6 @@ footer a {
   }
 
   .panel,
-  .split,
-  .cta {
-    padding: 22px;
-    border-radius: 16px;
   }
 
   footer {
