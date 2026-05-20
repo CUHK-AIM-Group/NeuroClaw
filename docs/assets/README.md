@@ -46,11 +46,9 @@ NeuroClaw prioritizes **data processing** and **model configuration/execution**.
 
 ## 🚀 Updates
 
-- **[2026.05.20]**: 7 atoms × 15 canonical tasks + 4 mediation chains in `neurooracle.atoms`.
-- **[2026.05.15]**: NeuroOracle launched: knowledge-graph explorer plus hypothesis engine with live demo at https://huggingface.co/spaces/zxcvb20001/NeuroOracle.
 - **[2026.05.06]**: Added 19 dataset and modality skills with companion scripts; all 85 skills enforce unified metadata (`layer`, `skill_type`, `dependencies`); skill_loader DAG validation ensures dependency graph correctness.
 - **[2026.04.28]**: Our technical report is now available on arXiv: https://arxiv.org/abs/2604.24696
-- **[2026.04.22]**: v1.0 released. Stable release with improvements and full documentation.
+- **[2026.04.22]**: v1.0 released — stable release with improvements and full documentation.
 - **[2026.04.17]**: Our project homepage is now live. Welcome to visit: https://cuhk-aim-group.github.io/NeuroClaw/
 - **[2026.04.08]**: NeuroBench released for multi-agent neuroimaging workflow evaluation.
 - **[2026.04.02]**: v0.1 released with complete NeuroClaw framework and core functionality.
@@ -106,9 +104,6 @@ NeuroClaw prioritizes **data processing** and **model configuration/execution**.
 - **True Model Execution**: Beyond sharing docs, it guides and executes model reproduction
 - **Environment Isolation**: Virtual environments and containerization avoid system pollution
 - **Verifiable Processes**: Complete logging and result tracking
-- **Shadow Checkpoints**: Git-based filesystem snapshots for rollback and diff comparison without polluting the project repository
-- **Subagent Orchestration**: Spawns specialized subagents (biostatistician, clinical neuroscientist, methodology expert) for multi-perspective task execution
-- **Reflective Learning**: Automatic reflection on tool failures and task completion, with persistent memory for cross-session learning
 
 ### 🧠 End-to-End Research Coverage
 - **Literature Review**: arXiv search, PubMed retrieval, academic resource integration
@@ -317,14 +312,12 @@ NeuroClaw/
 │   ├── asl-skill/
 │   ├── bids-organizer/
 │   ├── beautiful-log/
-│   ├── bnt/
 │   ├── bold5000-skill/
 │   ├── brain-visualization/
 │   ├── brain_gnn/
 │   ├── claw-shell/
 │   ├── cobre-skill/
 │   ├── camcan-skill/
-│   ├── combraintf/
 │   ├── conda-env-manager/
 │   ├── conn-tool/
 │   ├── dcm2nii/
@@ -354,12 +347,10 @@ NeuroClaw/
 │   ├── hcpya-skill/
 │   ├── hcppipeline-tool/
 │   ├── hierarchical/
-│   ├── ibgnn/
 │   ├── ica/
 │   ├── ixi-skill/
 │   ├── kmeans/
 │   ├── knowledge-graph-builder/
-│   ├── lggnn/
 │   ├── method-design/
 │   ├── mne-eeg-tool/
 │   ├── meg-skill/
@@ -464,10 +455,6 @@ Subagent in NeuroClaw includes four categories: **tool**, **model**, **dataset**
 | `run_models` | Model registry and model execution orchestration | ✅ |
 | `wmh-segmentation` | White matter hyperintensity segmentation (MARS-WMH nnU-Net) | ✅ |
 | `brain_gnn` | BrainGNN: graph neural network for fMRI classification | ✅ |
-| `bnt` | BrainNetworkTransformer: dense FC Transformer with DEC pooling for phenotype prediction | ✅ |
-| `combraintf` | Com-BrainTF: community-aware two-level Transformer over dense FC matrices | ✅ |
-| `ibgnn` | IBGNN: interpretable PyG-based GNN with MLP message function and edge-mask explainer | ✅ |
-| `lggnn` | LG-GNN: PyG-based GNN with Self-Attention Brain Pooling and mutual-information regularization | ✅ |
 | `fm_app` | FM-APP: multi-stage phenotype prediction with fMRI+sMRI | ✅ |
 | `neurostorm` | NeuroStorm: neuroimaging foundation model | ✅ |
 | `glm` | Classical first-level and second-level GLM for task-fMRI activation and group inference | ✅ |
